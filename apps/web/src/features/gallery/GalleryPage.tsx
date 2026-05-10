@@ -5,7 +5,6 @@ import mug from "@/assets/work-mug.jpg";
 import stickers from "@/assets/work-stickers.jpg";
 import banner from "@/assets/work-banner.jpg";
 
-
 const gallery = [
   { src: cards, alt: "Tarjetas de presentación premium" },
   { src: flyers, alt: "Flyers a todo color" },

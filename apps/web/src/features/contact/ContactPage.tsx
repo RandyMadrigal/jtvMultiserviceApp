@@ -2,13 +2,12 @@
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
-
 const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER ?? "10000000000";
 
 export function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: SubmitEvent) => {
     e.preventDefault();
     const text = `Hola, soy ${form.name} (${form.email}). ${form.message}`;
     window.open(

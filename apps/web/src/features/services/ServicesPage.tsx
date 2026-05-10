@@ -12,7 +12,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-
 const items = [
   {
     icon: Printer,

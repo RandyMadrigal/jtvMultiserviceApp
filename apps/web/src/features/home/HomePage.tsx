@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { products } from "@/shared/data/products";
 
-
 const services = [
   { icon: Printer, label: "Impresión digital" },
   { icon: ImageIcon, label: "Tarjetas personalizadas" },

@@ -1,5 +1,9 @@
 ﻿import { Layout } from "@/shared/components/Layout";
-import { products, categories, type ProductStatus } from "@/shared/data/products";
+import {
+  products,
+  categories,
+  type ProductStatus,
+} from "@/shared/data/products";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
