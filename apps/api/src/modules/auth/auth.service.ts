@@ -5,7 +5,9 @@ import { env } from "@/shared/config/env";
 import type { LoginDto } from "./auth.types";
 
 export async function login(dto: LoginDto): Promise<string> {
-  const admin = await AdminModel.findOne({ email: dto.email }).select("+password");
+  const admin = await AdminModel.findOne({ email: dto.email }).select(
+    "+password",
+  );
 
   if (!admin || !bcrypt.compareSync(dto.password, admin.password)) {
     throw Object.assign(new Error("Credenciales inválidas"), { status: 401 });
@@ -14,6 +16,6 @@ export async function login(dto: LoginDto): Promise<string> {
   return jwt.sign(
     { sub: admin._id.toString(), email: admin.email },
     env.JWT_SECRET,
-    { expiresIn: env.JWT_EXPIRES_IN },
+    { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"] },
   );
 }
