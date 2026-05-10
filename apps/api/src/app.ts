@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import { env } from "@/shared/config/env";
 import { errorMiddleware } from "@/shared/middleware/error.middleware";
 import { authRouter } from "@/modules/auth/auth.routes";
+import { categoriesRouter } from "@/modules/categories/categories.routes";
 import { productsRouter } from "@/modules/products/products.routes";
 import { adminRouter } from "@/modules/admin/admin.routes";
 
@@ -36,9 +37,10 @@ app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
 // ── Routes ───────────────────────────────────────────────────────────────────
-app.use("/api/auth",     authRouter);
-app.use("/api/products", productsRouter);
-app.use("/api/admin",    adminRouter);
+app.use("/api/auth",       authRouter);
+app.use("/api/categories", categoriesRouter);
+app.use("/api/products",   productsRouter);
+app.use("/api/admin",      adminRouter);
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 

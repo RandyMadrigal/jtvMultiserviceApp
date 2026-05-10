@@ -3,7 +3,7 @@ import rateLimit from "express-rate-limit";
 import { requireAuth } from "@/shared/middleware/auth.middleware";
 import { validate } from "@/shared/middleware/validate.middleware";
 import { loginSchema } from "./auth.types";
-import { loginHandler, refreshHandler, logoutHandler } from "./auth.controller";
+import { loginHandler, refreshHandler, logoutHandler, meHandler } from "./auth.controller";
 
 export const authRouter = Router();
 
@@ -16,3 +16,4 @@ const loginLimiter = rateLimit({
 authRouter.post("/login",   loginLimiter, validate(loginSchema), loginHandler);
 authRouter.post("/refresh", refreshHandler);
 authRouter.post("/logout",  requireAuth, logoutHandler);
+authRouter.get("/me",       requireAuth, meHandler);

@@ -1,10 +1,17 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { HomePage } from "./features/home/HomePage";
 import { CatalogPage } from "./features/catalog/CatalogPage";
 import { ServicesPage } from "./features/services/ServicesPage";
 import { AboutPage } from "./features/about/AboutPage";
 import { GalleryPage } from "./features/gallery/GalleryPage";
 import { ContactPage } from "./features/contact/ContactPage";
+import { AuthProvider } from "./features/admin/lib/auth.context";
+import { ProtectedRoute } from "./features/admin/components/ProtectedRoute";
+import { AdminLayout } from "./features/admin/components/AdminLayout";
+import { LoginPage } from "./features/admin/auth/LoginPage";
+import { ProductsAdminPage } from "./features/admin/products/ProductsAdminPage";
+import { CategoriesAdminPage } from "./features/admin/categories/CategoriesAdminPage";
+import { AdminsPage } from "./features/admin/admins/AdminsPage";
 
 function NotFoundPage() {
   return (
@@ -32,14 +39,34 @@ function NotFoundPage() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/catalogo" element={<CatalogPage />} />
-      <Route path="/servicios" element={<ServicesPage />} />
-      <Route path="/nosotros" element={<AboutPage />} />
-      <Route path="/galeria" element={<GalleryPage />} />
-      <Route path="/contacto" element={<ContactPage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        {/* ── Sitio público ─────────────────────────────────────── */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/catalogo" element={<CatalogPage />} />
+        <Route path="/servicios" element={<ServicesPage />} />
+        <Route path="/nosotros" element={<AboutPage />} />
+        <Route path="/galeria" element={<GalleryPage />} />
+        <Route path="/contacto" element={<ContactPage />} />
+
+        {/* ── Panel de administración ───────────────────────────── */}
+        <Route path="/admin/login" element={<LoginPage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/admin/products" replace />} />
+          <Route path="products"   element={<ProductsAdminPage />} />
+          <Route path="categories" element={<CategoriesAdminPage />} />
+          <Route path="admins"     element={<AdminsPage />} />
+        </Route>
+
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </AuthProvider>
   );
 }
