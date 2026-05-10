@@ -20,7 +20,7 @@ interface Product {
   name: string;
   description: string;
   category: Category;
-  image_url: string;
+  images: Array<{ url: string }>;
 }
 
 const services = [
@@ -150,7 +150,7 @@ export function HomePage() {
                   className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant"
                 >
                   <div className="aspect-4/3 overflow-hidden bg-secondary">
-                    <img src={p.image_url} alt={p.name} loading="lazy"
+                    <img src={p.images[0]?.url ?? ""} alt={p.name} loading="lazy"
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   </div>

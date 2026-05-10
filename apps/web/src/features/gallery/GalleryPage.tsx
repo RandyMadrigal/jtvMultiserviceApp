@@ -5,7 +5,7 @@ import { api } from "@/shared/lib/api";
 interface Product {
   _id: string;
   name: string;
-  image_url: string;
+  images: Array<{ url: string }>;
 }
 
 export function GalleryPage() {
@@ -14,7 +14,7 @@ export function GalleryPage() {
 
   useEffect(() => {
     api.get<Product[]>("/products")
-      .then(({ data }) => setProducts(data.filter((p) => p.image_url)))
+      .then(({ data }) => setProducts(data.filter((p) => p.images?.length > 0)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -44,7 +44,7 @@ export function GalleryPage() {
               {products.map((p) => (
                 <figure key={p._id} className="group overflow-hidden rounded-2xl bg-card shadow-card">
                   <img
-                    src={p.image_url}
+                    src={p.images[0]?.url ?? ""}
                     alt={p.name}
                     loading="lazy"
                     className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"

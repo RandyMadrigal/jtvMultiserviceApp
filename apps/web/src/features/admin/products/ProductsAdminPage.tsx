@@ -115,8 +115,8 @@ export function ProductsAdminPage() {
                 products.map((p) => (
                   <tr key={p._id} className="hover:bg-secondary/20">
                     <td className="px-4 py-3">
-                      {p.image_url ? (
-                        <img src={p.image_url} alt={p.name}
+                      {p.images?.[0]?.url ? (
+                        <img src={p.images[0].url} alt={p.name}
                           className="h-10 w-10 rounded-md object-cover" />
                       ) : (
                         <div className="flex h-10 w-10 items-center justify-center rounded-md bg-secondary">
