@@ -24,17 +24,19 @@ export async function createAdmin(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  console.log(req.body);
   try {
     const dto = req.body as CreateAdminDto;
     const hash = bcrypt.hashSync(dto.password, 12);
     const admin = await AdminModel.create({ email: dto.email, password: hash });
-    res.status(201).json({
-      id: admin._id,
-      email: admin.email,
-      msg: "Admin created successfully",
-    });
+    res.status(201).json({ id: admin._id, email: admin.email });
   } catch (e) {
+    // Correo duplicado → clave única de MongoDB (código 11000)
+    if ((e as { code?: number }).code === 11000) {
+      res.status(409).json({
+        error: "Ya existe un administrador con ese correo electrónico",
+      });
+      return;
+    }
     next(e);
   }
 }

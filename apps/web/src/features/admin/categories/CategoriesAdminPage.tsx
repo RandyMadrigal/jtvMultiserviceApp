@@ -3,23 +3,20 @@ import { Plus, Pencil, Trash2, X, Check, UserCircle } from "lucide-react";
 import { apiClient } from "../lib/api-client";
 
 interface Category {
-  _id: string;
-  name: string;
-  description: string;
+  _id:       string;
+  name:      string;
   createdBy?: { _id: string; email: string } | null;
 }
 
 export function CategoriesAdminPage() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading]       = useState(true);
-  const [creating, setCreating]     = useState(false);
-  const [editingId, setEditingId]   = useState<string | null>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [creating,   setCreating]   = useState(false);
+  const [editingId,  setEditingId]  = useState<string | null>(null);
 
-  // form state
-  const [name, setName]         = useState("");
-  const [description, setDesc]  = useState("");
+  const [name,       setName]       = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError]       = useState("");
+  const [error,      setError]      = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -34,13 +31,13 @@ export function CategoriesAdminPage() {
   useEffect(() => { load(); }, []);
 
   const openCreate = () => {
-    setName(""); setDesc(""); setError("");
+    setName(""); setError("");
     setEditingId(null);
     setCreating(true);
   };
 
   const openEdit = (c: Category) => {
-    setName(c.name); setDesc(c.description); setError("");
+    setName(c.name); setError("");
     setCreating(false);
     setEditingId(c._id);
   };
@@ -52,9 +49,9 @@ export function CategoriesAdminPage() {
     setSubmitting(true); setError("");
     try {
       if (editingId) {
-        await apiClient.put(`/categories/${editingId}`, { name, description });
+        await apiClient.put(`/categories/${editingId}`, { name });
       } else {
-        await apiClient.post("/categories", { name, description });
+        await apiClient.post("/categories", { name });
       }
       cancel();
       await load();
@@ -79,7 +76,7 @@ export function CategoriesAdminPage() {
 
   const InlineForm = () => (
     <tr className="bg-primary/5">
-      <td className="px-4 py-3" colSpan={3}>
+      <td className="px-4 py-3" colSpan={2}>
         <div className="space-y-2">
           <input
             autoFocus
@@ -87,18 +84,10 @@ export function CategoriesAdminPage() {
             value={name}
             maxLength={80}
             onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50"
           />
-          <input
-            placeholder="Descripción (opcional)"
-            value={description}
-            maxLength={200}
-            onChange={(e) => setDesc(e.target.value)}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50"
-          />
-          {error && (
-            <p className="text-xs text-destructive">{error}</p>
-          )}
+          {error && <p className="text-xs text-destructive">{error}</p>}
         </div>
       </td>
       <td className="px-4 py-3">
@@ -142,7 +131,6 @@ export function CategoriesAdminPage() {
             <thead className="border-b border-border bg-secondary/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 text-left">Nombre</th>
-                <th className="px-4 py-3 text-left">Descripción</th>
                 <th className="px-4 py-3 text-left">Creado por</th>
                 <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
@@ -151,7 +139,7 @@ export function CategoriesAdminPage() {
               {creating && <InlineForm />}
               {categories.length === 0 && !creating ? (
                 <tr>
-                  <td colSpan={4} className="py-16 text-center text-muted-foreground">
+                  <td colSpan={3} className="py-16 text-center text-muted-foreground">
                     No hay categorías. Crea la primera.
                   </td>
                 </tr>
@@ -162,7 +150,6 @@ export function CategoriesAdminPage() {
                   ) : (
                     <tr key={c._id} className="hover:bg-secondary/20">
                       <td className="px-4 py-3 font-medium">{c.name}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{c.description || "—"}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <UserCircle className="h-3.5 w-3.5 shrink-0" />

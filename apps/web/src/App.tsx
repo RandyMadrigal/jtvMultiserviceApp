@@ -5,6 +5,7 @@ import { ServicesPage } from "./features/services/ServicesPage";
 import { AboutPage } from "./features/about/AboutPage";
 import { GalleryPage } from "./features/gallery/GalleryPage";
 import { ContactPage } from "./features/contact/ContactPage";
+import { ThemeProvider } from "./shared/lib/theme.context";
 import { AuthProvider } from "./features/admin/lib/auth.context";
 import { ProtectedRoute } from "./features/admin/components/ProtectedRoute";
 import { AdminLayout } from "./features/admin/components/AdminLayout";
@@ -39,6 +40,7 @@ function NotFoundPage() {
 
 export default function App() {
   return (
+    <ThemeProvider>
     <AuthProvider>
       <Routes>
         {/* ── Sitio público ─────────────────────────────────────── */}
@@ -68,5 +70,6 @@ export default function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AuthProvider>
+    </ThemeProvider>
   );
 }

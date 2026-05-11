@@ -1,6 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X, Printer } from "lucide-react";
+import { Menu, X, Printer, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/shared/lib/theme.context";
 
 const links = [
   { to: "/", label: "Inicio" },
@@ -23,6 +24,8 @@ const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { theme, toggle } = useTheme();
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
@@ -37,31 +40,44 @@ export function Navbar() {
 
         <nav className="hidden items-center gap-1 md:flex">
           {links.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.to === "/"}
-              className={navLinkClass}
-            >
+            <NavLink key={l.to} to={l.to} end={l.to === "/"} className={navLinkClass}>
               {l.label}
             </NavLink>
           ))}
         </nav>
 
-        <Link
-          to="/contacto"
-          className="hidden rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-transform hover:scale-105 md:inline-flex"
-        >
-          Cotizar ahora
-        </Link>
+        <div className="hidden items-center gap-2 md:flex">
+          <button
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            className="rounded-md p-2 text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <Link
+            to="/contacto"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-transform hover:scale-105"
+          >
+            Cotizar ahora
+          </Link>
+        </div>
 
-        <button
-          aria-label="Abrir menú"
-          className="rounded-md p-2 md:hidden"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <button
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            className="rounded-md p-2 text-foreground/70 transition-colors hover:bg-secondary"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button
+            aria-label="Abrir menú"
+            className="rounded-md p-2"
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (

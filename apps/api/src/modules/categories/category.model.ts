@@ -2,9 +2,8 @@ import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
   {
-    name:        { type: String, required: true, unique: true, trim: true, maxlength: 80 },
-    description: { type: String, default: "", maxlength: 200 },
-    createdBy:   { type: mongoose.Schema.Types.ObjectId, ref: "Admin", default: null },
+    name:      { type: String, required: true, unique: true, trim: true, maxlength: 80 },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", default: null },
   },
   { timestamps: true },
 );
