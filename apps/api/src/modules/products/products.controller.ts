@@ -1,6 +1,7 @@
-import type { Response, NextFunction } from "express";
+import type { Response } from "express";
 import type { AuthRequest } from "@/shared/middleware/auth.middleware";
 import type { UploadRequest } from "@/shared/middleware/upload.middleware";
+import { asyncHandler } from "@/shared/utils/asyncHandler";
 import {
   listProducts,
   getProduct,
@@ -11,26 +12,33 @@ import {
 
 type Req = AuthRequest & UploadRequest;
 
-export async function list(_req: Req, res: Response, next: NextFunction): Promise<void> {
-  try { res.json(await listProducts()); } catch (e) { next(e); }
-}
+export const list = asyncHandler(async (req: Req, res: Response) => {
+  const page     = Number(req.query.page)     || 1;
+  const limit    = Number(req.query.limit)    || 20;
+  const search   = (req.query.search   as string | undefined) ?? undefined;
+  const category = (req.query.category as string | undefined) ?? undefined;
+  const status   = (req.query.status   as string | undefined) ?? undefined;
 
-export async function get(req: Req, res: Response, next: NextFunction): Promise<void> {
-  try { res.json(await getProduct(req.params.id as string)); } catch (e) { next(e); }
-}
+  res.json(await listProducts({ page, limit, search, category, status }));
+});
 
-export async function create(req: Req, res: Response, next: NextFunction): Promise<void> {
-  try {
-    res.status(201).json(await createProduct(req.body, req.adminId!, req.uploadedImages ?? []));
-  } catch (e) { next(e); }
-}
+export const get = asyncHandler(async (req: Req, res: Response) => {
+  res.json(await getProduct(req.params.id as string));
+});
 
-export async function update(req: Req, res: Response, next: NextFunction): Promise<void> {
-  try {
-    res.json(await updateProduct(req.params.id as string, req.body, req.uploadedImages));
-  } catch (e) { next(e); }
-}
+export const create = asyncHandler(async (req: Req, res: Response) => {
+  res.status(201).json(
+    await createProduct(req.body, req.adminId!, req.uploadedImages ?? []),
+  );
+});
 
-export async function remove(req: Req, res: Response, next: NextFunction): Promise<void> {
-  try { await deleteProduct(req.params.id as string); res.status(204).send(); } catch (e) { next(e); }
-}
+export const update = asyncHandler(async (req: Req, res: Response) => {
+  res.json(
+    await updateProduct(req.params.id as string, req.body, req.uploadedImages),
+  );
+});
+
+export const remove = asyncHandler(async (req: Req, res: Response) => {
+  await deleteProduct(req.params.id as string);
+  res.status(204).send();
+});

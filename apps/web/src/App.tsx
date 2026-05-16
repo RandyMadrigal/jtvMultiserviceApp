@@ -1,18 +1,29 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
-import { HomePage } from "./features/home/HomePage";
-import { CatalogPage } from "./features/catalog/CatalogPage";
-import { ServicesPage } from "./features/services/ServicesPage";
-import { AboutPage } from "./features/about/AboutPage";
-import { GalleryPage } from "./features/gallery/GalleryPage";
-import { ContactPage } from "./features/contact/ContactPage";
 import { ThemeProvider } from "./shared/lib/theme.context";
 import { AuthProvider } from "./features/admin/lib/auth.context";
 import { ProtectedRoute } from "./features/admin/components/ProtectedRoute";
-import { AdminLayout } from "./features/admin/components/AdminLayout";
-import { LoginPage } from "./features/admin/auth/LoginPage";
-import { ProductsAdminPage } from "./features/admin/products/ProductsAdminPage";
-import { CategoriesAdminPage } from "./features/admin/categories/CategoriesAdminPage";
-import { AdminsPage } from "./features/admin/admins/AdminsPage";
+import { ErrorBoundary } from "./shared/components/ErrorBoundary";
+
+// Lazy loading — cada ruta se carga solo cuando se navega a ella
+const HomePage            = lazy(() => import("./features/home/HomePage")           .then((m) => ({ default: m.HomePage })));
+const CatalogPage         = lazy(() => import("./features/catalog/CatalogPage")     .then((m) => ({ default: m.CatalogPage })));
+const ServicesPage        = lazy(() => import("./features/services/ServicesPage")   .then((m) => ({ default: m.ServicesPage })));
+const AboutPage           = lazy(() => import("./features/about/AboutPage")         .then((m) => ({ default: m.AboutPage })));
+const ContactPage         = lazy(() => import("./features/contact/ContactPage")     .then((m) => ({ default: m.ContactPage })));
+const LoginPage           = lazy(() => import("./features/admin/auth/LoginPage")    .then((m) => ({ default: m.LoginPage })));
+const AdminLayout         = lazy(() => import("./features/admin/components/AdminLayout").then((m) => ({ default: m.AdminLayout })));
+const ProductsAdminPage   = lazy(() => import("./features/admin/products/ProductsAdminPage").then((m) => ({ default: m.ProductsAdminPage })));
+const CategoriesAdminPage = lazy(() => import("./features/admin/categories/CategoriesAdminPage").then((m) => ({ default: m.CategoriesAdminPage })));
+const AdminsPage          = lazy(() => import("./features/admin/admins/AdminsPage") .then((m) => ({ default: m.AdminsPage })));
+
+function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    </div>
+  );
+}
 
 function NotFoundPage() {
   return (
@@ -41,35 +52,38 @@ function NotFoundPage() {
 export default function App() {
   return (
     <ThemeProvider>
-    <AuthProvider>
-      <Routes>
-        {/* ── Sitio público ─────────────────────────────────────── */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/catalogo" element={<CatalogPage />} />
-        <Route path="/servicios" element={<ServicesPage />} />
-        <Route path="/nosotros" element={<AboutPage />} />
-        <Route path="/galeria" element={<GalleryPage />} />
-        <Route path="/contacto" element={<ContactPage />} />
+      <AuthProvider>
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* ── Sitio público ───────────────────────────────────── */}
+              <Route path="/"         element={<HomePage />} />
+              <Route path="/catalogo" element={<CatalogPage />} />
+              <Route path="/servicios" element={<ServicesPage />} />
+              <Route path="/nosotros" element={<AboutPage />} />
+              <Route path="/contacto" element={<ContactPage />} />
 
-        {/* ── Panel de administración ───────────────────────────── */}
-        <Route path="/admin/login" element={<LoginPage />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="/admin/products" replace />} />
-          <Route path="products"   element={<ProductsAdminPage />} />
-          <Route path="categories" element={<CategoriesAdminPage />} />
-          <Route path="admins"     element={<AdminsPage />} />
-        </Route>
+              {/* ── Panel de administración ─────────────────────────── */}
+              <Route path="/admin/login" element={<LoginPage />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate to="/admin/products" replace />} />
+                <Route path="products"   element={<ProductsAdminPage />} />
+                <Route path="categories" element={<CategoriesAdminPage />} />
+                <Route path="admins"     element={<AdminsPage />} />
+              </Route>
 
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AuthProvider>
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

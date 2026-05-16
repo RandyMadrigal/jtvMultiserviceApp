@@ -3,6 +3,10 @@ import axios from "axios";
 // Token guardado en memoria del módulo — invisible para XSS
 let accessToken: string | null = null;
 
+// Promise compartida entre requests concurrentes que fallen con 401
+// Evita múltiples llamadas paralelas al endpoint de refresh
+let refreshPromise: Promise<string> | null = null;
+
 export function setToken(token: string | null): void {
   accessToken = token;
 }
@@ -20,29 +24,46 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Si recibe 401 intenta renovar el access token una sola vez
+// Si recibe 401 intenta renovar el access token una sola vez.
+// Múltiples requests concurrentes comparten el mismo refresh promise.
 apiClient.interceptors.response.use(
   (res) => res,
   async (error) => {
     const config = error.config as typeof error.config & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !config._retry) {
-      config._retry = true;
-      try {
-        const { data } = await axios.post(
+    if (error.response?.status !== 401 || config._retry) {
+      return Promise.reject(error);
+    }
+
+    config._retry = true;
+
+    if (!refreshPromise) {
+      refreshPromise = axios
+        .post<{ accessToken: string }>(
           "/api/auth/refresh",
           {},
           { withCredentials: true },
-        );
-        setToken(data.accessToken);
-        config.headers.Authorization = `Bearer ${data.accessToken}`;
-        return apiClient(config);
-      } catch {
-        setToken(null);
-        window.location.href = "/admin/login";
-      }
+        )
+        .then(({ data }) => {
+          setToken(data.accessToken);
+          return data.accessToken;
+        })
+        .catch((err) => {
+          setToken(null);
+          window.location.href = "/admin/login";
+          return Promise.reject(err);
+        })
+        .finally(() => {
+          refreshPromise = null;
+        });
     }
 
-    return Promise.reject(error);
+    try {
+      const newToken = await refreshPromise;
+      config.headers.Authorization = `Bearer ${newToken}`;
+      return apiClient(config);
+    } catch {
+      return Promise.reject(error);
+    }
   },
 );

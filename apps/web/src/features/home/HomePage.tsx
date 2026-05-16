@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/shared/components/Layout";
-import heroImg from "@/assets/hero-printing.jpg";
+import heroImg from "@/assets/logoJtv.jpeg";
 import {
   ArrowRight,
   Printer,
-  Image as ImageIcon,
+  Tag,
   Stamp,
   Sparkles,
   Zap,
   Heart,
   BadgeDollarSign,
+  Shirt,
+  Flag,
 } from "lucide-react";
 import { api } from "@/shared/lib/api";
 
@@ -18,7 +20,6 @@ interface Category {
   _id: string;
   name: string;
 }
-
 interface Product {
   _id: string;
   name: string;
@@ -26,24 +27,52 @@ interface Product {
   category: Category;
   images: Array<{ url: string }>;
 }
+interface PaginatedProducts {
+  items: Product[];
+}
 
 const services = [
-  { icon: Printer, label: "Impresión digital" },
-  { icon: ImageIcon, label: "Tarjetas personalizadas" },
-  { icon: Sparkles, label: "Stickers & Vinilos" },
-  { icon: Stamp, label: "Sellos & Invitaciones" },
-  { icon: ImageIcon, label: "Banners & Letreros" },
+  {
+    icon: Printer,
+    label: "Impresión General",
+    desc: "Tarjetas de presentación, volantes, brochures, afiches, pósters, carpetas corporativas, sobres y talonarios.",
+  },
+  {
+    icon: Sparkles,
+    label: "Stickers & Etiquetas",
+    desc: "Vinilo troquelado, holográfico, adhesivo y resistente al agua. Libros, folletos y carpetas.",
+  },
+  {
+    icon: Stamp,
+    label: "Sellos Gomigrafos",
+    desc: "Automáticos, de madera o pre-tintados. Papel membretado y sobres con tu identidad corporativa.",
+  },
+  {
+    icon: Flag,
+    label: "Banners & Letreros",
+    desc: "Lona vinílica con ojales, viniles decorativos y promocionales, cajas personalizadas y rotulación.",
+  },
+  {
+    icon: Shirt,
+    label: "Material Promocional",
+    desc: "Camisetas personalizadas, gorras bordadas o estampadas, llaveros, bolígrafos y tazas promocionales.",
+  },
+  {
+    icon: Tag,
+    label: "Diseño & Publicidad",
+    desc: "Branding, logotipos, vallas publicitarias, banderolas, material POP y merchandising político.",
+  },
 ];
 
 const reasons = [
   {
     icon: Sparkles,
-    title: "Calidad profesional",
-    desc: "Materiales premium y acabados impecables en cada pieza.",
+    title: "Calidad garantizada",
+    desc: "Materiales premium y acabados impecables en cada proyecto.",
   },
   {
     icon: Zap,
-    title: "Entrega rápida",
+    title: "Entregas puntuales",
     desc: "Producción ágil sin sacrificar la calidad de tu trabajo.",
   },
   {
@@ -63,8 +92,9 @@ export function HomePage() {
 
   useEffect(() => {
     api
-      .get<Product[]>("/products")
-      .then(({ data }) => setFeatured(data.slice(0, 6)));
+      .get<PaginatedProducts>("/products?limit=6&page=1")
+      .then(({ data }) => setFeatured(data.items))
+      .catch(() => setFeatured([]));
   }, []);
 
   return (
@@ -101,14 +131,13 @@ export function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-6 rounded-3xl bg-primary/20 blur-3xl" />
+          <div className="flex items-center justify-center">
             <img
               src={heroImg}
               alt="Productos impresos JTV Multiservice"
               width={1536}
               height={1024}
-              className="relative rounded-2xl shadow-elegant"
+              className="w-full drop-shadow-2xl"
             />
           </div>
         </div>
@@ -121,8 +150,9 @@ export function HomePage() {
             <h2 className="text-3xl font-bold md:text-4xl">
               Nuestros servicios
             </h2>
-            <p className="mt-3 text-muted-foreground">
-              Todo lo que necesitas para destacar tu marca o evento.
+            <p className="mt-3 text-muted-foreground text-justify">
+              Ofrecemos una amplia gama de servicios personalizados que se
+              adaptan a cualquier necesidad.
             </p>
           </div>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -135,9 +165,7 @@ export function HomePage() {
                   <s.icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-semibold">{s.label}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Producción profesional con materiales de primera calidad.
-                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{s.desc}</p>
               </div>
             ))}
           </div>

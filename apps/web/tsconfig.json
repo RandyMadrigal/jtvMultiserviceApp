@@ -21,7 +21,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@jtv/shared":   ["../../packages/shared/src/index.ts"],
+      "@jtv/shared/*": ["../../packages/shared/src/*"]
     }
   }
 }
