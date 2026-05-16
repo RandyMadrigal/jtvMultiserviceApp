@@ -1,13 +1,13 @@
 {
   "name": "jtv-multiservice",
   "private": true,
-  "workspaces": ["apps/*"],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "npm run dev -w apps/web",
-    "build": "npm run build -w apps/web",
-    "preview": "npm run preview -w apps/web",
-    "dev:api": "npm run dev -w apps/api",
+    "dev":       "npm run dev -w apps/web",
+    "build":     "npm run build -w apps/web",
+    "preview":   "npm run preview -w apps/web",
+    "dev:api":   "npm run dev -w apps/api",
     "build:api": "npm run build -w apps/api",
-    "lint": "npm run lint -w apps/web"
+    "lint":      "npm run lint -w apps/web"
   }
 }

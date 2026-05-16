@@ -1,12 +1,21 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, Package, Users, LogOut, Printer, Tag, Sun, Moon } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  LogOut,
+  Printer,
+  Tag,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { useAuth } from "../lib/auth.context";
 import { useTheme } from "@/shared/lib/theme.context";
 
 const navItems = [
-  { to: "/admin/products",   icon: Package, label: "Productos" },
-  { to: "/admin/categories", icon: Tag,     label: "Categorías" },
-  { to: "/admin/admins",     icon: Users,   label: "Administradores" },
+  { to: "/admin/products", icon: Package, label: "Productos" },
+  { to: "/admin/categories", icon: Tag, label: "Categorías" },
+  { to: "/admin/admins", icon: Users, label: "Administradores" },
 ];
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -29,7 +38,9 @@ export function AdminLayout() {
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-linear-to-br from-primary to-primary/70 text-primary-foreground">
             <Printer className="h-4 w-4" />
           </span>
-          <span className="text-sm">JTV <span className="text-primary">Admin</span></span>
+          <span className="text-sm">
+            JTV <span className="text-primary">Admin</span>
+          </span>
         </div>
 
         {/* Nav */}
@@ -48,9 +59,11 @@ export function AdminLayout() {
             onClick={toggle}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
-            {theme === "dark"
-              ? <Sun className="h-4 w-4" />
-              : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
             {theme === "dark" ? "Modo claro" : "Modo oscuro"}
           </button>
 
@@ -69,7 +82,9 @@ export function AdminLayout() {
         <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
           <div className="flex items-center gap-2">
             <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Panel de administración</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              Panel de administración
+            </span>
           </div>
         </header>
         <div className="flex-1 p-6">

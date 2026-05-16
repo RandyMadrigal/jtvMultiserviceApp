@@ -13,7 +13,9 @@
     "resolveJsonModule": true,
     "noEmit": false,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@jtv/shared":   ["../../packages/shared/src/index.ts"],
+      "@jtv/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": ["src/**/*.ts"],

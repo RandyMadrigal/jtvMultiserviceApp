@@ -1,13 +1,25 @@
-﻿import { Layout } from "@/shared/components/Layout";
+import React, { useState } from "react";
+import { Layout } from "@/shared/components/Layout";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
-import { useState } from "react";
 
-const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER ?? "10000000000";
+const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER ?? "18096894995";
+
+const contacts = [
+  { icon: Phone, label: "Teléfono / WhatsApp", value: "809-689-4995" },
+  { icon: Mail, label: "Correo", value: "jtvmultiservice@gmail.com" },
+  {
+    icon: MapPin,
+    label: "Dirección",
+    value:
+      "Av. España No. 2, Local 204, Isabel La Católica, Zona Colonial, Santo Domingo, D.N.",
+  },
+  { icon: Clock, label: "Horario", value: "Lun – Sáb · 8:00 a.m. – 5:00 p.m." },
+];
 
 export function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
-  const submit = (e: SubmitEvent) => {
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const text = `Hola, soy ${form.name} (${form.email}). ${form.message}`;
     window.open(
@@ -30,30 +42,7 @@ export function ContactPage() {
       <section className="py-16">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 md:grid-cols-2 md:px-6">
           <div className="space-y-5">
-            {[
-              { icon: Phone, label: "Teléfono", value: "+1 (000) 000-0000" },
-              {
-                icon: MessageCircle,
-                label: "WhatsApp",
-                value: "+1 (000) 000-0000",
-              },
-              {
-                icon: Mail,
-                label: "Correo",
-                value: "contacto@jtvmultiservice.com",
-              },
-              {
-                icon: MapPin,
-                label: "Dirección",
-                value:
-                  "LOREN IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT.",
-              },
-              {
-                icon: Clock,
-                label: "Horario",
-                value: "Lun – Sáb · 8:00 A.M a 05:00 P.M",
-              },
-            ].map((c) => (
+            {contacts.map((c) => (
               <div
                 key={c.label}
                 className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 shadow-card"

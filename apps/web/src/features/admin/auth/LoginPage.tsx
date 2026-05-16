@@ -5,9 +5,9 @@ import { useAuth } from "../lib/auth.context";
 
 export function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth();
-  const [email, setEmail]       = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError]       = useState("");
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   if (isLoading) return null;
@@ -34,11 +34,15 @@ export function LoginPage() {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-card">
             <Printer className="h-5 w-5" />
           </span>
-          <span className="text-xl">JTV <span className="text-primary">Admin</span></span>
+          <span className="text-xl">
+            JTV <span className="text-primary">Admin</span>
+          </span>
         </div>
 
         <h1 className="mb-1 text-xl font-bold">Iniciar sesión</h1>
-        <p className="mb-6 text-sm text-muted-foreground">Accede al panel de administración</p>
+        <p className="mb-6 text-sm text-muted-foreground">
+          Accede al panel de administración
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -57,7 +61,10 @@ export function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="password">
+            <label
+              className="mb-1 block text-sm font-medium"
+              htmlFor="password"
+            >
               Contraseña
             </label>
             <input
