@@ -4,10 +4,15 @@ import { connectDb, disconnectDb } from "@/shared/database/db";
 import { initDefaultAdmin } from "@/shared/database/init";
 import { logger } from "@/shared/utils/logger";
 import type { Server } from "http";
+import { startMemoryMonitor } from "./shared/utils/memory-monitor";
 
 async function main(): Promise<void> {
   await connectDb();
   await initDefaultAdmin();
+
+  if (process.env.NODE_ENV === "development") {
+    startMemoryMonitor();
+  }
 
   const server: Server = app.listen(env.PORT, () => {
     logger.info({ port: env.PORT, env: env.NODE_ENV }, "JTV API iniciada");
@@ -37,7 +42,7 @@ async function main(): Promise<void> {
   }
 
   process.on("SIGTERM", () => shutdown("SIGTERM"));
-  process.on("SIGINT",  () => shutdown("SIGINT"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
 
   process.on("unhandledRejection", (reason) => {
     logger.error({ reason }, "Unhandled promise rejection");
