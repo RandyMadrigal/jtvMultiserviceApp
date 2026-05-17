@@ -110,7 +110,7 @@ export function Footer() {
                 <MapPin className="h-3.5 w-3.5" />
               </span>
               <span className="leading-relaxed">
-                Av. España No. 2, Local 204
+                Calle Isabel la católica esquina Gabino Puello/ Plaza Dalbert
                 <br />
                 Zona Colonial, Santo Domingo, D.N.
               </span>

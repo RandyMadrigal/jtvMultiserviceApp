@@ -12,12 +12,19 @@ import {
 
 type Req = AuthRequest & UploadRequest;
 
+const VALID_STATUSES = ["disponible", "agotado", "promocion"] as const;
+
 export const list = asyncHandler(async (req: Req, res: Response) => {
   const page     = Number(req.query.page)     || 1;
   const limit    = Number(req.query.limit)    || 20;
   const search   = (req.query.search   as string | undefined) ?? undefined;
   const category = (req.query.category as string | undefined) ?? undefined;
-  const status   = (req.query.status   as string | undefined) ?? undefined;
+
+  // I-3d: Validar que status sea uno de los valores permitidos; si no, ignorarlo
+  const rawStatus = req.query.status as string | undefined;
+  const status    = VALID_STATUSES.includes(rawStatus as typeof VALID_STATUSES[number])
+    ? rawStatus
+    : undefined;
 
   res.json(await listProducts({ page, limit, search, category, status }));
 });

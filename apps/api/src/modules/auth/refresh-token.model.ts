@@ -8,5 +8,7 @@ const refreshTokenSchema = new mongoose.Schema({
 
 // MongoDB elimina el documento automáticamente cuando llega expiresAt
 refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// I-6: Índice en adminId para que deleteMany({ adminId }) sea eficiente
+refreshTokenSchema.index({ adminId: 1 });
 
 export const RefreshToken = mongoose.model("RefreshToken", refreshTokenSchema);

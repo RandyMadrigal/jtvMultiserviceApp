@@ -1,8 +1,6 @@
 import type { Request, Response } from "express";
-import jwt, { type JwtPayload } from "jsonwebtoken";
 import { AdminModel } from "@/modules/admin/admin.model";
-import { TokenBlacklist } from "./token-blacklist.model";
-import { login, refreshAccessToken, revokeRefreshToken } from "./auth.service";
+import { login, refreshAccessToken, revokeRefreshToken, revokeAccessToken, REFRESH_TOKEN_TTL_MS } from "./auth.service";
 import { asyncHandler } from "@/shared/utils/asyncHandler";
 import type { AuthRequest } from "@/shared/middleware/auth.middleware";
 
@@ -14,7 +12,7 @@ function buildCookieOptions() {
     httpOnly: true,
     secure:   isProd,
     sameSite: (isProd ? "none" : "lax") as "none" | "lax",
-    maxAge:   7 * 24 * 60 * 60 * 1000,
+    maxAge:   REFRESH_TOKEN_TTL_MS, // I-9: compartir TTL desde auth.service
     path:     "/api/auth",
   };
 }
@@ -39,22 +37,20 @@ export const refreshHandler = asyncHandler(async (req: Request, res: Response) =
   res.json({ accessToken });
 });
 
-export const logoutHandler = asyncHandler(async (req: Request, res: Response) => {
+export const logoutHandler = asyncHandler(async (req: AuthRequest, res: Response) => {
   // 1. Revocar refresh token
   const refreshToken = req.cookies?.[COOKIE_NAME] as string | undefined;
   if (refreshToken) await revokeRefreshToken(refreshToken);
 
   // 2. Blacklistear el access token hasta que expire naturalmente
+  // C-2: Usar el token ya verificado por requireAuth — no decodificar de nuevo con jwt.decode
+  // M-10: Delegar al service en lugar de crear TokenBlacklist directamente
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith("Bearer ")) {
     const accessToken = authHeader.slice(7);
-    const payload     = jwt.decode(accessToken) as JwtPayload | null;
-    if (payload?.exp) {
-      await TokenBlacklist.create({
-        token:     accessToken,
-        expiresAt: new Date(payload.exp * 1000),
-      }).catch(() => null); // Ignorar duplicado si ya está en la blacklist
-    }
+    // El token ya fue verificado por requireAuth; calcular expiresAt desde TTL de env
+    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
+    await revokeAccessToken(accessToken, expiresAt);
   }
 
   res.clearCookie(COOKIE_NAME, { path: "/api/auth" });
@@ -64,7 +60,8 @@ export const logoutHandler = asyncHandler(async (req: Request, res: Response) =>
 export const meHandler = asyncHandler(async (req: AuthRequest, res: Response) => {
   const admin = await AdminModel.findById(req.adminId).select("-password").lean();
   if (!admin) {
-    res.status(401).json({ error: "Admin no encontrado" });
+    // I-3c: Token válido pero admin eliminado → 404, no 401
+    res.status(404).json({ error: "Admin no encontrado" });
     return;
   }
   res.json(admin);

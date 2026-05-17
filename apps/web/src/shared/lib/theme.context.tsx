@@ -1,9 +1,15 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
 type Theme = "light" | "dark";
 
 interface ThemeContextType {
-  theme:  Theme;
+  theme: Theme;
   toggle: () => void;
 }
 
@@ -13,7 +19,9 @@ function getInitialTheme(): Theme {
   try {
     const saved = localStorage.getItem("theme") as Theme | null;
     if (saved === "light" || saved === "dark") return saved;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   } catch {
     return "light";
   }
@@ -28,7 +36,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const toggle = () => setTheme((t) => (t === "light" ? "dark" : "light"));
+  const toggle = () => {
+    const root = document.documentElement;
+    root.classList.add("theme-transitioning");
+    setTheme((t) => (t === "light" ? "dark" : "light"));
+    window.setTimeout(() => root.classList.remove("theme-transitioning"), 400);
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, toggle }}>

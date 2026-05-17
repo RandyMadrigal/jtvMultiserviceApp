@@ -128,6 +128,7 @@ export function Navbar() {
           <button
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
+            aria-controls="mobile-menu"
             className="rounded-lg p-2 text-foreground/70 transition-colors hover:bg-secondary"
             onClick={() => setOpen((v) => !v)}
           >
@@ -138,7 +139,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
+        <div id="mobile-menu" className="border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
           <nav
             className="mx-auto flex max-w-7xl flex-col gap-0.5 px-4 py-3"
             aria-label="Menú móvil"

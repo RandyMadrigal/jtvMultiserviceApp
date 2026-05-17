@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
+import { MongoRateLimitStore } from "@/shared/middleware/mongo-rate-limit-store";
 import mongoose from "mongoose";
 import { env } from "@/shared/config/env";
 import { errorMiddleware } from "@/shared/middleware/error.middleware";
@@ -24,14 +25,14 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc:  ["'self'"],
-        imgSrc:      ["'self'", "https://res.cloudinary.com", "data:"],
-        scriptSrc:   ["'self'"],
-        styleSrc:    ["'self'", "'unsafe-inline'"],
-        connectSrc:  ["'self'"],
-        fontSrc:     ["'self'"],
-        objectSrc:   ["'none'"],
-        frameSrc:    ["'none'"],
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", "https://res.cloudinary.com", "data:"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameSrc: ["'none'"],
         upgradeInsecureRequests: env.NODE_ENV === "production" ? [] : null,
       },
     },
@@ -43,12 +44,14 @@ const allowedOrigins = env.CORS_ORIGINS.split(",").map((o) => o.trim());
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // ── Global rate limit ────────────────────────────────────────────────────────
+// Store en MongoDB: persiste entre reinicios y funciona con múltiples instancias.
 app.use(
   rateLimit({
     windowMs: 60 * 1000,
     max: 120,
     standardHeaders: true,
     legacyHeaders: false,
+    store: new MongoRateLimitStore(),
     message: { error: "Demasiadas solicitudes. Intenta más tarde." },
   }),
 );
@@ -65,19 +68,29 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 
 // ── Routes ───────────────────────────────────────────────────────────────────
-app.use("/api/auth",       authRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/categories", categoriesRouter);
-app.use("/api/products",   productsRouter);
-app.use("/api/admin",      adminRouter);
+app.use("/api/products", productsRouter);
+app.use("/api/admin", adminRouter);
 
 // ── Health check ─────────────────────────────────────────────────────────────
-app.get("/health", async (_req, res) => {
-  const dbState   = mongoose.connection.readyState;
+//Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
+app.get("/health", async (req, res) => {
+  const healthToken = process.env.HEALTH_TOKEN;
+  if (healthToken) {
+    const provided = req.headers["x-health-token"];
+    if (!provided || provided !== healthToken) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+  }
+
+  const dbState = mongoose.connection.readyState;
   const dbHealthy = dbState === 1;
-  const checks    = {
-    status:    dbHealthy ? "ok" : "degraded",
-    db:        dbHealthy ? "ok" : "error",
-    uptime:    Math.floor(process.uptime()),
+  const checks = {
+    status: dbHealthy ? "ok" : "degraded",
+    db: dbHealthy ? "ok" : "error",
+    uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
   };
   res.status(dbHealthy ? 200 : 503).json(checks);

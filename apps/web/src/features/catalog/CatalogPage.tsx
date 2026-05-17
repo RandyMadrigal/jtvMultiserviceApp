@@ -1,4 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
+import axios from "axios";
 import {
   Search,
   ChevronLeft,
@@ -8,14 +10,12 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { Layout } from "@/shared/components/Layout";
+import { PageHeader } from "@/shared/components/PageHeader";
 import { api } from "@/shared/lib/api";
+import type { Category, PaginatedProducts } from "@/shared/types/api";
 
 type Status = "disponible" | "agotado" | "promocion";
 
-interface Category {
-  _id: string;
-  name: string;
-}
 interface Product {
   _id: string;
   name: string;
@@ -23,13 +23,6 @@ interface Product {
   category: Category;
   images: Array<{ url: string }>;
   status: Status;
-}
-interface PaginatedProducts {
-  items: Product[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
 }
 
 const STATUS_STYLES: Record<Status, string> = {
@@ -68,29 +61,29 @@ function ImageModal({ src, alt, onClose }: ImageModalProps) {
     };
   }, []);
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label={`Vista ampliada: ${alt}`}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-sm"
       style={{ animation: "fadeIn 0.15s ease" }}
       onClick={onClose}
     >
       <div
-        className="relative max-h-[90vh] max-w-5xl"
+        className="relative inline-flex max-w-[calc(100vw-2rem)] sm:max-w-5xl"
         onClick={(e) => e.stopPropagation()}
+        style={{ animation: "scaleIn 0.15s ease" }}
       >
         <img
           src={src}
           alt={alt}
-          className="max-h-[90vh] max-w-full rounded-2xl object-contain shadow-2xl"
-          style={{ animation: "scaleIn 0.15s ease" }}
+          className="block max-h-[82vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl"
         />
         <button
           onClick={onClose}
           aria-label="Cerrar imagen"
-          className="absolute -right-3 -top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-foreground shadow-lg transition hover:bg-secondary"
+          className="absolute right-0 top-0 -translate-y-1/2 translate-x-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-gray-900 shadow-lg transition hover:bg-gray-100"
         >
           <X className="h-4 w-4" />
         </button>
@@ -99,7 +92,8 @@ function ImageModal({ src, alt, onClose }: ImageModalProps) {
         @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
         @keyframes scaleIn { from { transform: scale(0.94); opacity: 0 } to { transform: scale(1); opacity: 1 } }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -141,12 +135,22 @@ export function CatalogPage() {
   );
 
   useEffect(() => {
-    api.get<Category[]>("/categories").then(({ data }) => setCategories(data));
+    const controller = new AbortController();
+    api
+      .get<Category[]>("/categories", { signal: controller.signal })
+      .then(({ data }) => setCategories(data))
+      .catch((err) => { if (!axios.isCancel(err)) setCategories([]); });
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     fetchProducts(q, cat, page);
+    return () => controller.abort();
   }, [q, cat, page, fetchProducts]);
+
+  // Cleanup pending debounce on unmount
+  useEffect(() => () => clearTimeout(debounceRef.current), []);
 
   const handleSearch = (value: string) => {
     setInputQ(value);
@@ -177,27 +181,16 @@ export function CatalogPage() {
       )}
 
       {/* ── Page Header ────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-border bg-secondary/50 py-16">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-25"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 80% at 90% 50%, rgba(0,153,217,0.2) 0%, transparent 70%)",
-          }}
-          aria-hidden="true"
-        />
-        <div className="relative mx-auto max-w-7xl px-4 md:px-6">
-          <span className="text-xs font-semibold uppercase tracking-widest text-primary">
-            Nuestros productos
-          </span>
-          <h1 className="mt-2 text-4xl font-bold md:text-5xl">Catálogo</h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Descubre todo lo que podemos imprimir para ti. Filtra por categoría
-            o busca por nombre.
-          </p>
+      <PageHeader
+        eyebrow="Nuestros productos"
+        title="Catálogo"
+        subtitle="Descubre todo lo que podemos imprimir para ti. Filtra por categoría o busca por nombre."
+      />
 
-          {/* Search + Filters */}
-          <div className="mt-8 flex flex-col gap-4">
+      {/* ── Search + Filters ────────────────────────────────────────────── */}
+      <section className="border-b border-border bg-secondary/50 px-4 pb-6 md:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="pt-6 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-3 duration-700 delay-300 fill-mode-both">
             <div className="flex flex-col gap-3 md:flex-row md:items-center">
               {/* Search input */}
               <div className="relative w-full max-w-sm">
@@ -206,6 +199,7 @@ export function CatalogPage() {
                   value={inputQ}
                   onChange={(e) => handleSearch(e.target.value)}
                   placeholder="Buscar producto…"
+                  aria-label="Buscar producto"
                   className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3.5 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
                 />
               </div>
@@ -232,6 +226,7 @@ export function CatalogPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => handleCatChange("")}
+                aria-pressed={cat === ""}
                 className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
                   cat === ""
                     ? "border-primary bg-gradient-brand text-white shadow-glass"
@@ -244,6 +239,7 @@ export function CatalogPage() {
                 <button
                   key={c._id}
                   onClick={() => handleCatChange(c._id)}
+                  aria-pressed={cat === c._id}
                   className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
                     cat === c._id
                       ? "border-primary bg-gradient-brand text-white shadow-glass"
@@ -298,7 +294,7 @@ export function CatalogPage() {
                     {/* Image */}
                     <div className="relative aspect-4/3 overflow-hidden bg-secondary">
                       <img
-                        src={p.images[0]?.url ?? ""}
+                        src={p.images[0]?.url ?? "/placeholder.jpg"}
                         alt={p.name}
                         loading="lazy"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -320,7 +316,7 @@ export function CatalogPage() {
                           aria-label={`Ver imagen de ${p.name}`}
                           className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/30"
                         >
-                          <span className="flex h-11 w-11 scale-75 items-center justify-center rounded-full bg-white/90 text-foreground opacity-0 shadow-lg transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
+                          <span className="flex h-11 w-11 scale-75 items-center justify-center rounded-full bg-white/90 text-gray-900 opacity-0 shadow-lg transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
                             <ZoomIn className="h-5 w-5" />
                           </span>
                         </button>

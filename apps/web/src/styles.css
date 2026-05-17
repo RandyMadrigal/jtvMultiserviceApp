@@ -177,6 +177,17 @@
   }
 }
 
+/* ── Theme switch transition ───────────────────────────────────────────────── */
+/* Applied only during the toggle — removed after 400 ms so hover transitions stay snappy */
+.theme-transitioning,
+.theme-transitioning * {
+  transition:
+    background-color 0.35s ease,
+    color            0.35s ease,
+    border-color     0.35s ease,
+    box-shadow       0.35s ease !important;
+}
+
 /* ── Page enter animation ──────────────────────────────────────────────────── */
 @keyframes pageEnter {
   from { opacity: 0; transform: translateY(6px); }
@@ -186,20 +197,6 @@
   animation: pageEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ── Scroll-driven section reveal (CSS-native, modern browsers) ────────────── */
-@keyframes sectionReveal {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@supports (animation-timeline: view()) {
-  section {
-    animation: sectionReveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-timeline: view();
-    /* Start animating when section edge enters viewport, finish when 25% is visible */
-    animation-range: entry 0% entry 25%;
-  }
-}
 
 @layer utilities {
   /* Gradients */

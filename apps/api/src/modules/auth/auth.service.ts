@@ -3,12 +3,15 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { AdminModel } from "@/modules/admin/admin.model";
 import { RefreshToken } from "./refresh-token.model";
+import { TokenBlacklist } from "./token-blacklist.model";
 import { env } from "@/shared/config/env";
 import { AppError } from "@/shared/errors/AppError";
 import { logger } from "@/shared/utils/logger";
 import type { LoginDto } from "./auth.types";
 
-const REFRESH_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
+// I-9: Exportar para que auth.controller pueda usarla sin duplicarla
+export const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
+const REFRESH_TTL_MS = REFRESH_TOKEN_TTL_MS; // alias interno
 
 function generateAccessToken(adminId: string): string {
   return jwt.sign(
@@ -77,4 +80,9 @@ export async function revokeRefreshToken(token: string): Promise<void> {
 export async function revokeAllAdminTokens(adminId: string): Promise<void> {
   const count = await RefreshToken.deleteMany({ adminId });
   logger.warn({ adminId, count: count.deletedCount }, "Todos los refresh tokens del admin revocados");
+}
+
+// M-10: Lógica de blacklist centralizada en el service
+export async function revokeAccessToken(token: string, expiresAt: Date): Promise<void> {
+  await TokenBlacklist.create({ token, expiresAt }).catch(() => null); // Ignorar duplicado si ya está en la blacklist
 }

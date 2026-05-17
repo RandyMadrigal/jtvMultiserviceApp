@@ -49,6 +49,7 @@ interface ProductCard {
 
 interface Props {
   product?: Product;
+  categories?: Category[];
   onSuccess: () => void;
   onClose: () => void;
 }
@@ -149,10 +150,10 @@ function CardStatus({ card }: { card: ProductCard }) {
 }
 
 /* ── Componente principal ──────────────────────────────────────────────────── */
-export function ProductForm({ product, onSuccess, onClose }: Props) {
+export function ProductForm({ product, categories: categoriesProp, onSuccess, onClose }: Props) {
   const isEdit = !!product;
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>(categoriesProp ?? []);
   const [cards, setCards] = useState<ProductCard[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [globalError, setGlobalError] = useState("");
@@ -165,13 +166,10 @@ export function ProductForm({ product, onSuccess, onClose }: Props) {
   const allDone = cards.length > 0 && cards.every((c) => c.state === "done");
   const hasErrors = cards.some((c) => c.state === "error");
 
-  /* ── Cargar categorías ────────────────────────────────────────────────── */
+  /* ── Cargar categorías (solo si no vinieron como prop) ───────────────── */
   useEffect(() => {
-    apiClient.get<Category[]>("/categories").then(({ data }) => {
-      setCategories(data);
-
-      // Modo edición: inicializar tarjeta con los datos del producto
-      if (product && data.length > 0) {
+    const initCards = (cats: Category[]) => {
+      if (product && cats.length > 0) {
         setCards([
           makeCard({
             tempId: product._id,
@@ -183,8 +181,18 @@ export function ProductForm({ product, onSuccess, onClose }: Props) {
           }),
         ]);
       }
+    };
+
+    if (categoriesProp && categoriesProp.length > 0) {
+      initCards(categoriesProp);
+      return;
+    }
+
+    apiClient.get<Category[]>("/categories").then(({ data }) => {
+      setCategories(data);
+      initCards(data);
     });
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Liberar object URLs al desmontar ────────────────────────────────── */
   useEffect(() => {

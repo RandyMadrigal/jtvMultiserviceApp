@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/shared/components/Layout";
+import { Reveal } from "@/shared/components/Reveal";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { QuoteCTA } from "@/shared/components/QuoteCTA";
 import {
   Printer,
-  Stamp,
   Shirt,
   Package,
   Megaphone,
   Palette,
-  ArrowRight,
   Check,
+  ArrowRight,
 } from "lucide-react";
 
 const categories = [
@@ -149,8 +151,6 @@ const categories = [
   },
 ];
 
-// suppress unused-import warnings
-void [Stamp];
 
 export function ServicesPage() {
   return (
@@ -167,11 +167,13 @@ export function ServicesPage() {
           aria-hidden="true"
         />
         <div className="relative mx-auto max-w-7xl px-4 md:px-6">
-          <span className="text-xs font-semibold uppercase tracking-widest text-primary">
+          <span className="text-xs font-semibold uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-3 duration-700 fill-mode-both">
             Producción gráfica integral
           </span>
-          <h1 className="mt-2 text-4xl font-bold md:text-5xl">Servicios</h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
+          <h1 className="mt-2 text-4xl font-bold md:text-5xl animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100 fill-mode-both">
+            Servicios
+          </h1>
+          <p className="mt-3 max-w-2xl text-muted-foreground animate-in fade-in duration-700 delay-200 fill-mode-both">
             Desde una tarjeta hasta una valla publicitaria — cualquier idea, la
             imprimimos con la calidad que mereces.
           </p>
@@ -181,8 +183,8 @@ export function ServicesPage() {
       {/* ── Service Categories ─────────────────────────────────────────── */}
       <section className="py-16">
         <div className="mx-auto max-w-7xl space-y-16 px-4 md:px-6">
-          {categories.map((cat, catIdx) => (
-            <div key={cat.title}>
+          {categories.map((cat) => (
+            <Reveal key={cat.title}>
               {/* Category Header */}
               <div className="mb-8 flex items-center gap-4">
                 <div
@@ -201,9 +203,8 @@ export function ServicesPage() {
                 {cat.services.map((s) => (
                   <div
                     key={s.name}
-                    className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-glass"
+                    className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-glass"
                   >
-                    {/* Hover tint */}
                     <div
                       className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                       style={{
@@ -228,42 +229,44 @@ export function ServicesPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
 
         {/* ── Bottom CTA ───────────────────────────────────────────────── */}
         <div className="mx-auto mt-16 max-w-7xl px-4 md:px-6">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-hero p-10 shadow-elegant md:p-14">
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(ellipse 65% 70% at 80% 20%, rgba(0,153,217,0.4) 0%, transparent 60%)," +
-                  "radial-gradient(ellipse 55% 60% at 10% 80%, rgba(193,0,126,0.35) 0%, transparent 60%)",
-              }}
-              aria-hidden="true"
-            />
-            <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-white/50">
-                  Trabajos a medida
-                </span>
-                <h2 className="mt-2 text-2xl font-bold text-white md:text-3xl">
-                  ¿No ves lo que buscas?
-                </h2>
-                <p className="mt-1.5 text-white/65">
-                  Hacemos trabajos personalizados — pregúntanos sin compromiso.
-                </p>
+          <Reveal zoom>
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-hero p-10 shadow-elegant md:p-14">
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 65% 70% at 80% 20%, rgba(0,153,217,0.4) 0%, transparent 60%)," +
+                    "radial-gradient(ellipse 55% 60% at 10% 80%, rgba(193,0,126,0.35) 0%, transparent 60%)",
+                }}
+                aria-hidden="true"
+              />
+              <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-white/50">
+                    Trabajos a medida
+                  </span>
+                  <h2 className="mt-2 text-2xl font-bold text-white md:text-3xl">
+                    ¿No ves lo que buscas?
+                  </h2>
+                  <p className="mt-1.5 text-white/65">
+                    Hacemos trabajos personalizados — pregúntanos sin compromiso.
+                  </p>
+                </div>
+                <Link
+                  to="/contacto"
+                  className="inline-flex w-fit shrink-0 items-center gap-2.5 rounded-2xl bg-gradient-brand px-7 py-3.5 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:scale-105 hover:shadow-glow"
+                >
+                  Solicitar cotización <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-              <Link
-                to="/contacto"
-                className="inline-flex w-fit shrink-0 items-center gap-2.5 rounded-2xl bg-gradient-brand px-7 py-3.5 text-sm font-bold text-white shadow-glow transition-all duration-300 hover:scale-105 hover:shadow-glow"
-              >
-                Solicitar cotización <ArrowRight className="h-4 w-4" />
-              </Link>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
     </Layout>

@@ -1,4 +1,5 @@
 import { ProductModel } from "./product.model";
+import { CategoryModel } from "@/modules/categories/category.model";
 import { cloudinary } from "@/shared/storage/cloudinary";
 import { AppError } from "@/shared/errors/AppError";
 import { logger } from "@/shared/utils/logger";
@@ -6,6 +7,7 @@ import type { ImageItem } from "@/shared/middleware/upload.middleware";
 import type { ProductDto } from "./products.types";
 
 const POPULATE_CATEGORY   = { path: "category",  select: "name _id" };
+// POPULATE_CREATED_BY solo se usa en endpoints de admin (autenticados)
 const POPULATE_CREATED_BY = { path: "createdBy", select: "email" };
 
 export interface ProductListOptions {
@@ -41,9 +43,8 @@ export async function listProducts(opts: ProductListOptions = {}): Promise<Pagin
 
   const [items, total] = await Promise.all([
     ProductModel.find(filter)
-      .select("name description category images status createdBy createdAt")
+      .select("name description category images status createdAt")
       .populate(POPULATE_CATEGORY)
-      .populate(POPULATE_CREATED_BY)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
@@ -57,14 +58,24 @@ export async function listProducts(opts: ProductListOptions = {}): Promise<Pagin
 export async function getProduct(id: string) {
   const doc = await ProductModel.findById(id)
     .populate(POPULATE_CATEGORY)
-    .populate(POPULATE_CREATED_BY)
     .lean();
   if (!doc) throw new AppError(404, "Producto no encontrado");
   return doc;
 }
 
 export async function createProduct(dto: ProductDto, adminId: string, images: ImageItem[]) {
-  const doc = await ProductModel.create({ ...dto, createdBy: adminId, images });
+  let doc;
+  try {
+    doc = await ProductModel.create({ ...dto, createdBy: adminId, images });
+  } catch (err) {
+    // I-4: Si la inserción en DB falla, limpiar las imágenes ya subidas a Cloudinary
+    if (images.length > 0) {
+      Promise.all(images.map((img) => cloudinary.uploader.destroy(img.public_id))).catch(
+        (cleanupErr) => logger.error({ cleanupErr }, "Error al limpiar imágenes huérfanas de Cloudinary"),
+      );
+    }
+    throw err;
+  }
   return (await doc.populate([POPULATE_CATEGORY, POPULATE_CREATED_BY])).toObject();
 }
 
@@ -75,6 +86,12 @@ export async function updateProduct(
 ) {
   const existing = await ProductModel.findById(id);
   if (!existing) throw new AppError(404, "Producto no encontrado");
+
+  // I-5: Validar que la categoría existe si se está cambiando
+  if (dto.category) {
+    const categoryExists = await CategoryModel.exists({ _id: dto.category });
+    if (!categoryExists) throw new AppError(404, "Categoría no encontrada");
+  }
 
   const replaceImages = newImages && newImages.length > 0;
   const oldImages     = replaceImages ? (existing.images as ImageItem[]) : [];
@@ -89,6 +106,9 @@ export async function updateProduct(
     .populate(POPULATE_CREATED_BY)
     .lean();
 
+  // I-1: Comprobar que updated no es null antes de retornarlo
+  if (!updated) throw new AppError(404, "Producto no encontrado");
+
   // 2. Limpiar Cloudinary solo después de que DB fue exitosa
   if (oldImages.length > 0) {
     Promise.all(oldImages.map((img) => cloudinary.uploader.destroy(img.public_id))).catch(
@@ -96,7 +116,7 @@ export async function updateProduct(
     );
   }
 
-  return updated!;
+  return updated;
 }
 
 export async function deleteProduct(id: string) {
