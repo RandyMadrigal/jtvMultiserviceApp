@@ -1,6 +1,6 @@
 import { NavLink, Link } from "react-router-dom";
-import { useState } from "react";
-import { Menu, X, Printer, Sun, Moon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/shared/lib/theme.context";
 
 const links = [
@@ -11,67 +11,124 @@ const links = [
   { to: "/contacto", label: "Contacto" },
 ] as const;
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  isActive
-    ? "rounded-md px-3 py-2 text-sm font-medium text-primary bg-accent"
-    : "rounded-md px-3 py-2 text-sm font-medium text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground";
-
-const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
-  isActive
-    ? "rounded-md px-3 py-2.5 text-sm font-medium text-primary bg-accent"
-    : "rounded-md px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-secondary";
+const PrintIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <polyline points="6 9 6 2 18 2 18 9" />
+    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+    <rect x="6" y="14" width="12" height="8" />
+  </svg>
+);
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { theme, toggle } = useTheme();
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+        scrolled
+          ? "bg-background/95 backdrop-blur-xl shadow-glass border-b border-border"
+          : "bg-background/80 backdrop-blur-md border-b border-border/50"
+      }`}
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
-        <Link to="/" className="flex items-center gap-2 font-bold text-brand">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand text-brand-foreground shadow-card">
-            <Printer className="h-5 w-5" />
-          </span>
-          <span className="text-lg tracking-tight">
-            JTV<span className="text-primary">.</span>Multiservice
-          </span>
+        {/* Logo */}
+        <Link to="/" className="group flex items-center gap-2.5">
+          <div className="leading-none">
+            <span className="block text-base font-bold tracking-tight text-foreground font-display">
+              JTV<span className="text-[#C1007E]">.</span>Multiservice
+            </span>
+            <span className="block text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
+              Imprenta &amp; Diseño
+            </span>
+          </div>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        {/* Desktop Nav */}
+        <nav
+          className="hidden items-center gap-0.5 md:flex"
+          aria-label="Navegación principal"
+        >
           {links.map((l) => (
-            <NavLink key={l.to} to={l.to} end={l.to === "/"} className={navLinkClass}>
+            <NavLink
+              key={l.to}
+              to={l.to}
+              end={l.to === "/"}
+              className={({ isActive }) =>
+                `relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? "text-primary bg-primary/10"
+                    : "text-foreground/65 hover:text-foreground hover:bg-secondary"
+                }`
+              }
+            >
               {l.label}
             </NavLink>
           ))}
         </nav>
 
+        {/* Desktop Actions */}
         <div className="hidden items-center gap-2 md:flex">
           <button
             onClick={toggle}
-            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-            className="rounded-md p-2 text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground"
+            aria-label={
+              theme === "dark"
+                ? "Cambiar a modo claro"
+                : "Cambiar a modo oscuro"
+            }
+            className="rounded-lg p-2 text-foreground/55 transition-all duration-200 hover:bg-secondary hover:text-foreground"
           >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
           <Link
             to="/contacto"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-transform hover:scale-105"
+            className="rounded-xl bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-white shadow-glass transition-all duration-300 hover:scale-105 hover:shadow-glow"
           >
             Cotizar ahora
           </Link>
         </div>
 
+        {/* Mobile Controls */}
         <div className="flex items-center gap-1 md:hidden">
           <button
             onClick={toggle}
-            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-            className="rounded-md p-2 text-foreground/70 transition-colors hover:bg-secondary"
+            aria-label={
+              theme === "dark"
+                ? "Cambiar a modo claro"
+                : "Cambiar a modo oscuro"
+            }
+            className="rounded-lg p-2 text-foreground/55 transition-colors hover:bg-secondary"
           >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
           <button
-            aria-label="Abrir menú"
-            className="rounded-md p-2"
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={open}
+            className="rounded-lg p-2 text-foreground/70 transition-colors hover:bg-secondary"
             onClick={() => setOpen((v) => !v)}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -79,16 +136,26 @@ export function Navbar() {
         </div>
       </div>
 
+      {/* Mobile Menu */}
       {open && (
-        <div className="border-t border-border/60 bg-background md:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col px-4 py-3">
+        <div className="border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
+          <nav
+            className="mx-auto flex max-w-7xl flex-col gap-0.5 px-4 py-3"
+            aria-label="Menú móvil"
+          >
             {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 end={l.to === "/"}
                 onClick={() => setOpen(false)}
-                className={mobileNavLinkClass}
+                className={({ isActive }) =>
+                  `rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "text-foreground/70 hover:bg-secondary hover:text-foreground"
+                  }`
+                }
               >
                 {l.label}
               </NavLink>
@@ -96,7 +163,7 @@ export function Navbar() {
             <Link
               to="/contacto"
               onClick={() => setOpen(false)}
-              className="mt-2 rounded-md bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground"
+              className="mt-2 rounded-xl bg-gradient-brand px-4 py-3 text-center text-sm font-semibold text-white shadow-glass"
             >
               Cotizar ahora
             </Link>

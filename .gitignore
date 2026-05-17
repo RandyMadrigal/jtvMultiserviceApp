@@ -34,3 +34,5 @@ apps/api/data/
 #CLAUDE
 CLAUDE.md
 .claude
+.agents
+skills-lock.json

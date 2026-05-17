@@ -1,5 +1,12 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Search, ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  ZoomIn,
+  SlidersHorizontal,
+} from "lucide-react";
 import { Layout } from "@/shared/components/Layout";
 import { api } from "@/shared/lib/api";
 
@@ -26,9 +33,9 @@ interface PaginatedProducts {
 }
 
 const STATUS_STYLES: Record<Status, string> = {
-  disponible: "bg-success/15 text-black",
-  agotado: "bg-muted text-muted-foreground",
-  promocion: "bg-primary/15 text-primary",
+  disponible: "bg-emerald-500/15 text-emerald-700 border border-emerald-500/20",
+  agotado: "bg-muted text-muted-foreground border border-border",
+  promocion: "bg-[#C1007E]/12 text-[#C1007E] border border-[#C1007E]/20",
 };
 const STATUS_LABEL: Record<Status, string> = {
   disponible: "Disponible",
@@ -38,7 +45,7 @@ const STATUS_LABEL: Record<Status, string> = {
 
 const PAGE_SIZE = 12;
 
-// ── Modal de imagen ───────────────────────────────────────────────────────────
+// ── Image Modal ────────────────────────────────────────────────────────────────
 interface ImageModalProps {
   src: string;
   alt: string;
@@ -46,7 +53,6 @@ interface ImageModalProps {
 }
 
 function ImageModal({ src, alt, onClose }: ImageModalProps) {
-  // Cerrar con Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -55,7 +61,6 @@ function ImageModal({ src, alt, onClose }: ImageModalProps) {
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  // Evitar scroll del body mientras el modal está abierto
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -68,11 +73,10 @@ function ImageModal({ src, alt, onClose }: ImageModalProps) {
       role="dialog"
       aria-modal="true"
       aria-label={`Vista ampliada: ${alt}`}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
       style={{ animation: "fadeIn 0.15s ease" }}
       onClick={onClose}
     >
-      {/* Contenedor de imagen — detiene propagación para no cerrar al hacer click en la imagen */}
       <div
         className="relative max-h-[90vh] max-w-5xl"
         onClick={(e) => e.stopPropagation()}
@@ -80,27 +84,26 @@ function ImageModal({ src, alt, onClose }: ImageModalProps) {
         <img
           src={src}
           alt={alt}
-          className="max-h-[90vh] max-w-full rounded-xl object-contain shadow-2xl"
+          className="max-h-[90vh] max-w-full rounded-2xl object-contain shadow-2xl"
           style={{ animation: "scaleIn 0.15s ease" }}
         />
         <button
           onClick={onClose}
           aria-label="Cerrar imagen"
-          className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground shadow-lg transition hover:bg-secondary"
+          className="absolute -right-3 -top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white text-foreground shadow-lg transition hover:bg-secondary"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
-
       <style>{`
         @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes scaleIn { from { transform: scale(0.93); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+        @keyframes scaleIn { from { transform: scale(0.94); opacity: 0 } to { transform: scale(1); opacity: 1 } }
       `}</style>
     </div>
   );
 }
 
-// ── Página principal ──────────────────────────────────────────────────────────
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export function CatalogPage() {
   const [result, setResult] = useState<PaginatedProducts | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -165,7 +168,6 @@ export function CatalogPage() {
 
   return (
     <Layout>
-      {/* Modal de imagen ampliada */}
       {modalImage && (
         <ImageModal
           src={modalImage.src}
@@ -174,115 +176,166 @@ export function CatalogPage() {
         />
       )}
 
-      <section className="border-b border-border bg-secondary/40 py-14">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <h1 className="text-4xl font-bold md:text-5xl">Catálogo</h1>
+      {/* ── Page Header ────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-b border-border bg-secondary/50 py-16">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-25"
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 80% at 90% 50%, rgba(0,153,217,0.2) 0%, transparent 70%)",
+          }}
+          aria-hidden="true"
+        />
+        <div className="relative mx-auto max-w-7xl px-4 md:px-6">
+          <span className="text-xs font-semibold uppercase tracking-widest text-primary">
+            Nuestros productos
+          </span>
+          <h1 className="mt-2 text-4xl font-bold md:text-5xl">Catálogo</h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Descubre todo lo que podemos imprimir para ti. Filtra por categoría
             o busca por nombre.
           </p>
 
-          <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="relative w-full max-w-md">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={inputQ}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Buscar producto…"
-                className="w-full rounded-md border border-input bg-background py-2.5 pl-10 pr-3 text-sm outline-none ring-ring/50 focus:ring-2"
-              />
-            </div>
-          </div>
+          {/* Search + Filters */}
+          <div className="mt-8 flex flex-col gap-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center">
+              {/* Search input */}
+              <div className="relative w-full max-w-sm">
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={inputQ}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Buscar producto…"
+                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3.5 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/15"
+                />
+              </div>
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            <button
-              onClick={() => handleCatChange("")}
-              className={
-                "rounded-full border px-4 py-1.5 text-sm font-medium transition " +
-                (cat === ""
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background hover:border-primary/40 hover:text-primary")
-              }
-            >
-              Todos
-            </button>
-            {categories.map((c) => (
+              {/* Filter count indicator */}
+              {(cat || q) && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
+                  {total} resultado{total !== 1 ? "s" : ""}
+                  <button
+                    onClick={() => {
+                      handleSearch("");
+                      handleCatChange("");
+                    }}
+                    className="ml-1 flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs font-medium transition hover:border-primary/40 hover:text-primary"
+                  >
+                    <X className="h-3 w-3" /> Limpiar
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Category pills */}
+            <div className="flex flex-wrap gap-2">
               <button
-                key={c._id}
-                onClick={() => handleCatChange(c._id)}
-                className={
-                  "rounded-full border px-4 py-1.5 text-sm font-medium transition " +
-                  (cat === c._id
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background hover:border-primary/40 hover:text-primary")
-                }
+                onClick={() => handleCatChange("")}
+                className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
+                  cat === ""
+                    ? "border-primary bg-gradient-brand text-white shadow-glass"
+                    : "border-border bg-card hover:border-primary/40 hover:text-primary"
+                }`}
               >
-                {c.name}
+                Todos
               </button>
-            ))}
+              {categories.map((c) => (
+                <button
+                  key={c._id}
+                  onClick={() => handleCatChange(c._id)}
+                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
+                    cat === c._id
+                      ? "border-primary bg-gradient-brand text-white shadow-glass"
+                      : "border-border bg-card hover:border-primary/40 hover:text-primary"
+                  }`}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
+      {/* ── Product Grid ────────────────────────────────────────────────── */}
       <section className="py-14">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           {loading ? (
-            <div className="flex h-48 items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            <div className="flex h-60 items-center justify-center">
+              <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-border border-t-primary" />
             </div>
           ) : products.length === 0 ? (
-            <p className="py-20 text-center text-muted-foreground">
-              {total === 0 && !q && !cat
-                ? "El catálogo está vacío por el momento."
-                : "No encontramos productos para tu búsqueda."}
-            </p>
+            <div className="flex flex-col items-center gap-4 py-24 text-center">
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-secondary text-muted-foreground">
+                <Search className="h-7 w-7" />
+              </div>
+              <p className="text-muted-foreground">
+                {total === 0 && !q && !cat
+                  ? "El catálogo está vacío por el momento."
+                  : "No encontramos productos para tu búsqueda."}
+              </p>
+              {(q || cat) && (
+                <button
+                  onClick={() => {
+                    handleSearch("");
+                    handleCatChange("");
+                  }}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
           ) : (
             <>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {products.map((p) => (
                   <article
                     key={p._id}
-                    className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:-translate-y-1 hover:shadow-elegant"
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-elegant"
                   >
-                    {/* Imagen — clickeable para abrir modal */}
+                    {/* Image */}
                     <div className="relative aspect-4/3 overflow-hidden bg-secondary">
                       <img
                         src={p.images[0]?.url ?? ""}
                         alt={p.name}
                         loading="lazy"
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
+
+                      {/* Status badge */}
                       <span
-                        className={
-                          "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider " +
-                          STATUS_STYLES[p.status]
-                        }
+                        className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm ${STATUS_STYLES[p.status]}`}
                       >
                         {STATUS_LABEL[p.status]}
                       </span>
 
-                      {/* Overlay de zoom — solo visible si hay imagen */}
+                      {/* Zoom overlay */}
                       {p.images[0]?.url && (
                         <button
                           onClick={() =>
                             setModalImage({ src: p.images[0].url, alt: p.name })
                           }
                           aria-label={`Ver imagen de ${p.name}`}
-                          className="absolute inset-0 flex items-center justify-center bg-black/0 transition duration-300 group-hover:bg-black/30"
+                          className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/30"
                         >
-                          <span className="flex h-10 w-10 scale-75 items-center justify-center rounded-full bg-white/90 text-foreground opacity-0 shadow-lg transition duration-300 group-hover:scale-100 group-hover:opacity-100">
+                          <span className="flex h-11 w-11 scale-75 items-center justify-center rounded-full bg-white/90 text-foreground opacity-0 shadow-lg transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">
                             <ZoomIn className="h-5 w-5" />
                           </span>
                         </button>
                       )}
                     </div>
 
+                    {/* Content */}
                     <div className="flex flex-1 flex-col p-5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                      <p className="text-[11px] font-semibold uppercase tracking-widest text-primary">
                         {p.category?.name}
                       </p>
-                      <h3 className="mt-1 text-lg font-semibold">{p.name}</h3>
-                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                      <h3 className="mt-1.5 font-bold font-display text-base">
+                        {p.name}
+                      </h3>
+                      <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                         {p.description}
                       </p>
                     </div>
@@ -290,15 +343,15 @@ export function CatalogPage() {
                 ))}
               </div>
 
-              {/* Paginación */}
+              {/* Pagination */}
               {totalPages > 1 && (
-                <div className="mt-10 flex items-center justify-center gap-2">
+                <div className="mt-12 flex items-center justify-center gap-1.5">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="rounded-md p-2 text-muted-foreground transition hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-xl border border-border p-2 text-muted-foreground transition hover:border-primary/40 hover:bg-accent hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    <ChevronLeft className="h-5 w-5" />
+                    <ChevronLeft className="h-4 w-4" />
                   </button>
 
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -316,7 +369,7 @@ export function CatalogPage() {
                       item === "..." ? (
                         <span
                           key={`ellipsis-${idx}`}
-                          className="px-1 text-muted-foreground"
+                          className="px-2 text-muted-foreground"
                         >
                           …
                         </span>
@@ -324,12 +377,11 @@ export function CatalogPage() {
                         <button
                           key={item}
                           onClick={() => setPage(item as number)}
-                          className={
-                            "min-w-8 rounded-md px-3 py-1.5 text-sm font-medium transition " +
-                            (page === item
-                              ? "bg-primary text-primary-foreground"
-                              : "hover:bg-secondary text-foreground")
-                          }
+                          className={`min-w-9 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                            page === item
+                              ? "bg-gradient-brand text-white shadow-glass"
+                              : "border border-border bg-card hover:border-primary/40 hover:text-primary"
+                          }`}
                         >
                           {item}
                         </button>
@@ -339,9 +391,9 @@ export function CatalogPage() {
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="rounded-md p-2 text-muted-foreground transition hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-xl border border-border p-2 text-muted-foreground transition hover:border-primary/40 hover:bg-accent hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
               )}

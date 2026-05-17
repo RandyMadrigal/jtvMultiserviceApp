@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
-import { Printer } from "lucide-react";
+import { Navigate, Link } from "react-router-dom";
+import { Printer, ArrowLeft } from "lucide-react";
 import { useAuth } from "../lib/auth.context";
 
 export function LoginPage() {
@@ -92,6 +92,16 @@ export function LoginPage() {
             {submitting ? "Ingresando..." : "Ingresar"}
           </button>
         </form>
+
+        <div className="mt-5 border-t border-border pt-5">
+          <Link
+            to="/"
+            className="flex items-center justify-center gap-2 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver al sitio web
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { ThemeProvider } from "./shared/lib/theme.context";
 import { AuthProvider } from "./features/admin/lib/auth.context";
 import { ProtectedRoute } from "./features/admin/components/ProtectedRoute";
 import { ErrorBoundary } from "./shared/components/ErrorBoundary";
+import { ScrollToTop } from "./shared/components/ScrollToTop";
 
 // Lazy loading — cada ruta se carga solo cuando se navega a ella
 const HomePage            = lazy(() => import("./features/home/HomePage")           .then((m) => ({ default: m.HomePage })));
@@ -55,6 +56,7 @@ export default function App() {
       <AuthProvider>
         <ErrorBoundary>
           <Suspense fallback={<PageLoader />}>
+            <ScrollToTop />
             <Routes>
               {/* ── Sitio público ───────────────────────────────────── */}
               <Route path="/"         element={<HomePage />} />
