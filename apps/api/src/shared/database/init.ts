@@ -9,7 +9,7 @@ export async function initDefaultAdmin(): Promise<void> {
   // Upsert atómico — evita race condition si múltiples instancias arrancan simultáneamente
   const result = await AdminModel.findOneAndUpdate(
     { email: env.ADMIN_EMAIL },
-    { $setOnInsert: { email: env.ADMIN_EMAIL, password: hash } },
+    { $set: { isRoot: true }, $setOnInsert: { email: env.ADMIN_EMAIL, password: hash } },
     { upsert: true, new: false },
   );
 

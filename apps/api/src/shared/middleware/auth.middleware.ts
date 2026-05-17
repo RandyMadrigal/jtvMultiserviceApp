@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { env } from "@/shared/config/env";
 import { TokenBlacklist } from "@/modules/auth/token-blacklist.model";
+import { AdminModel } from "@/modules/admin/admin.model";
 
 export interface AuthRequest extends Request {
   adminId?: string;
@@ -34,5 +35,22 @@ export async function requireAuth(
     next();
   } catch {
     res.status(401).json({ error: "Token inválido o expirado" });
+  }
+}
+
+export async function requireRootAdmin(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const admin = await AdminModel.findById(req.adminId).select("email").lean();
+    if (!admin || admin.email !== env.ADMIN_EMAIL.toLowerCase()) {
+      res.status(403).json({ error: "Acción reservada al administrador raíz" });
+      return;
+    }
+    next();
+  } catch {
+    res.status(500).json({ error: "Error al verificar permisos" });
   }
 }
