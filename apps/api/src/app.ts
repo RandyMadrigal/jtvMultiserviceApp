@@ -25,31 +25,13 @@ app.use(requestIdMiddleware);
 
 // ── Health check ─────────────────────────────────────────────────────────────
 //Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
-app.get("/health", async (req, res) => {
-  // Railway's healthcheck proxy uses hostname "healthcheck.railway.app"
-  // and cannot send custom headers — bypass token validation for it.
-  const isRailwayHealthcheck = req.hostname === "healthcheck.railway.app";
-
-  const healthToken = process.env.HEALTH_TOKEN;
-  if (healthToken && !isRailwayHealthcheck) {
-    const provided = req.headers["x-health-token"];
-    if (!provided || provided !== healthToken) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-  }
-
-  const dbState = mongoose.connection.readyState;
-  const dbHealthy = dbState === 1;
-  const authenticated = !!process.env.HEALTH_TOKEN; // ya verificado arriba si existe
-  const checks = {
+app.get("/health", async (_req, res) => {
+  const dbHealthy = mongoose.connection.readyState === 1;
+  res.status(dbHealthy ? 200 : 503).json({
     status:    dbHealthy ? "ok" : "degraded",
     db:        dbHealthy ? "ok" : "error",
     timestamp: new Date().toISOString(),
-    // uptime solo para monitoreo autenticado — evita exponer patrones de despliegue
-    ...(authenticated && { uptime: Math.floor(process.uptime()) }),
-  };
-  res.status(dbHealthy ? 200 : 503).json(checks);
+  });
 });
 
 // ── Security headers ─────────────────────────────────────────────────────────
