@@ -11,6 +11,7 @@ import {
   Moon,
   Menu,
   X,
+  UserCircle,
 } from "lucide-react";
 import { useAuth } from "@/shared/lib/auth.context";
 import { useTheme } from "@/shared/lib/theme.context";
@@ -29,7 +30,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
   }`;
 
 export function AdminLayout() {
-  const { logout }        = useAuth();
+  const { user, logout }  = useAuth();
   const { theme, toggle } = useTheme();
   const [open, setOpen]   = useState(false);
 
@@ -59,6 +60,19 @@ export function AdminLayout() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Usuario logueado */}
+      {user && (
+        <div className="flex items-center gap-2 border-t border-border px-4 py-3">
+          <UserCircle className="h-8 w-8 shrink-0 text-muted-foreground" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground">{user.email}</p>
+            <p className="text-xs text-muted-foreground">
+              {user.isRoot ? "Administrador raíz" : "Administrador"}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Theme toggle + Logout */}
       <div className="border-t border-border p-3 space-y-1">
@@ -131,6 +145,13 @@ export function AdminLayout() {
               </span>
             </div>
           </div>
+
+          {user && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <UserCircle className="h-5 w-5" />
+              <span className="hidden sm:block">{user.email}</span>
+            </div>
+          )}
         </header>
 
         <div className="flex-1 p-4 md:p-6">

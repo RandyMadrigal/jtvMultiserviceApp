@@ -38,6 +38,8 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string): Prom
 }
 
 export async function sendOtpEmail(to: string, code: string): Promise<void> {
+  const loginUrl = `${env.APP_URL}/admin/login`;
+
   await resend.emails.send({
     from: env.RESEND_FROM,
     to,
@@ -55,6 +57,21 @@ export async function sendOtpEmail(to: string, code: string): Promise<void> {
                     padding:20px;background:#f4f4f5;border-radius:10px;margin:0 0 20px">
           ${code}
         </div>
+        <p style="color:#374151;margin:0 0 8px">
+          Ingresa con tu correo y contraseña en la página de acceso — el sistema te pedirá
+          este código para verificar tu cuenta:
+        </p>
+        <a href="${loginUrl}"
+           style="display:inline-block;background:#2563eb;color:#fff;font-weight:600;
+                  padding:12px 24px;border-radius:8px;text-decoration:none;margin:0 0 20px">
+          Ir a la página de acceso
+        </a>
+        <p style="color:#6b7280;font-size:0.875rem;margin:0 0 8px">
+          Si el botón no funciona, copia y pega este enlace en tu navegador:
+        </p>
+        <p style="color:#2563eb;font-size:0.8rem;word-break:break-all;margin:0 0 20px">
+          ${loginUrl}
+        </p>
         <p style="color:#6b7280;font-size:0.875rem;margin:0">
           Este código expira en <strong>15 minutos</strong>.
           Si no solicitaste esta cuenta, ignora este mensaje.
