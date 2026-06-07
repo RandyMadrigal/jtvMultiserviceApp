@@ -26,8 +26,12 @@ app.use(requestIdMiddleware);
 // ── Health check ─────────────────────────────────────────────────────────────
 //Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
 app.get("/health", async (req, res) => {
+  // Railway's healthcheck proxy uses hostname "healthcheck.railway.app"
+  // and cannot send custom headers — bypass token validation for it.
+  const isRailwayHealthcheck = req.hostname === "healthcheck.railway.app";
+
   const healthToken = process.env.HEALTH_TOKEN;
-  if (healthToken) {
+  if (healthToken && !isRailwayHealthcheck) {
     const provided = req.headers["x-health-token"];
     if (!provided || provided !== healthToken) {
       res.status(401).json({ error: "Unauthorized" });
