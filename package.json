@@ -2,6 +2,9 @@
   "name": "jtv-multiservice",
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev":       "npm run dev -w apps/web",
     "build":     "npm run build -w apps/web",
