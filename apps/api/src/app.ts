@@ -23,6 +23,31 @@ app.set("trust proxy", 1);
 // ── Request ID (debe ir primero para correlacionar todos los logs) ────────────
 app.use(requestIdMiddleware);
 
+// ── Health check ─────────────────────────────────────────────────────────────
+//Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
+app.get("/health", async (req, res) => {
+  const healthToken = process.env.HEALTH_TOKEN;
+  if (healthToken) {
+    const provided = req.headers["x-health-token"];
+    if (!provided || provided !== healthToken) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+  }
+
+  const dbState = mongoose.connection.readyState;
+  const dbHealthy = dbState === 1;
+  const authenticated = !!process.env.HEALTH_TOKEN; // ya verificado arriba si existe
+  const checks = {
+    status:    dbHealthy ? "ok" : "degraded",
+    db:        dbHealthy ? "ok" : "error",
+    timestamp: new Date().toISOString(),
+    // uptime solo para monitoreo autenticado — evita exponer patrones de despliegue
+    ...(authenticated && { uptime: Math.floor(process.uptime()) }),
+  };
+  res.status(dbHealthy ? 200 : 503).json(checks);
+});
+
 // ── Security headers ─────────────────────────────────────────────────────────
 app.use(
   helmet({
@@ -100,31 +125,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/categories", categoriesRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/admin", adminRouter);
-
-// ── Health check ─────────────────────────────────────────────────────────────
-//Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
-app.get("/health", async (req, res) => {
-  const healthToken = process.env.HEALTH_TOKEN;
-  if (healthToken) {
-    const provided = req.headers["x-health-token"];
-    if (!provided || provided !== healthToken) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-  }
-
-  const dbState = mongoose.connection.readyState;
-  const dbHealthy = dbState === 1;
-  const authenticated = !!process.env.HEALTH_TOKEN; // ya verificado arriba si existe
-  const checks = {
-    status:    dbHealthy ? "ok" : "degraded",
-    db:        dbHealthy ? "ok" : "error",
-    timestamp: new Date().toISOString(),
-    // uptime solo para monitoreo autenticado — evita exponer patrones de despliegue
-    ...(authenticated && { uptime: Math.floor(process.uptime()) }),
-  };
-  res.status(dbHealthy ? 200 : 503).json(checks);
-});
 
 // ── Error handler (debe ser el último middleware) ────────────────────────────
 app.use(errorMiddleware);
