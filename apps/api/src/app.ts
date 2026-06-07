@@ -76,37 +76,14 @@ app.use(
   }),
 );
 
-// ── Health check (antes de CORS — Railway no envía Origin en sus peticiones) ──
-//Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
-app.get("/health", async (req, res) => {
-  const healthToken = process.env.HEALTH_TOKEN;
-  if (healthToken) {
-    const provided = req.headers["x-health-token"];
-    if (!provided || provided !== healthToken) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-  }
-
-  const dbState   = mongoose.connection.readyState;
-  const dbHealthy = dbState === 1;
-  const authenticated = !!process.env.HEALTH_TOKEN;
-  res.status(dbHealthy ? 200 : 503).json({
-    status:    dbHealthy ? "ok" : "degraded",
-    db:        dbHealthy ? "ok" : "error",
-    timestamp: new Date().toISOString(),
-    ...(authenticated && { uptime: Math.floor(process.uptime()) }),
-  });
-});
-
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const allowedOrigins = env.CORS_ORIGINS.split(",").map((o) => o.trim()).filter(Boolean);
 app.use(
   cors({
     origin: (origin, callback) => {
-      // En desarrollo se permiten peticiones sin origen (Postman, curl)
-      if (!origin && env.NODE_ENV !== "production") return callback(null, true);
-      if (origin && allowedOrigins.includes(origin))  return callback(null, true);
+      // Sin Origin = petición server-to-server (healthchecks, curl) — CORS no aplica
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
       callback(new Error("Origen no permitido por CORS"));
     },
     credentials:    true,
