@@ -20,9 +20,9 @@ export function errorMiddleware(
     return;
   }
 
-  // Zod — validación de inputs
+  // Zod — validación de inputs (422 Unprocessable Entity es semánticamente correcto)
   if (err instanceof ZodError) {
-    res.status(400).json({
+    res.status(422).json({
       error: "Datos inválidos",
       details: err.flatten().fieldErrors,
     });
@@ -61,8 +61,8 @@ export function errorMiddleware(
   }
 
   res.status(status).json({
-    error: env.NODE_ENV === "production" && status >= 500
-      ? "Error interno del servidor"
+    error: env.NODE_ENV === "production"
+      ? (status >= 500 ? "Error interno del servidor" : "Error en la solicitud")
       : message,
     ...(env.NODE_ENV === "development" && err instanceof Error && { stack: err.stack }),
   });

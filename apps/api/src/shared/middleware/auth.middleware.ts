@@ -44,8 +44,8 @@ export async function requireRootAdmin(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const admin = await AdminModel.findById(req.adminId).select("email").lean();
-    if (!admin || admin.email !== env.ADMIN_EMAIL.toLowerCase()) {
+    const admin = await AdminModel.findById(req.adminId).select("isRoot").lean();
+    if (!admin?.isRoot) {
       res.status(403).json({ error: "Acción reservada al administrador raíz" });
       return;
     }

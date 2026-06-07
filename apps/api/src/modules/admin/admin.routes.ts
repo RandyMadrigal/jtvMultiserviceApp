@@ -12,7 +12,7 @@ const createAdminLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders:   false,
-  store:   new MongoRateLimitStore(),
+  store:   new MongoRateLimitStore("admin-create"),
   message: { error: "Demasiadas cuentas creadas recientemente. Intenta en 1 hora." },
 });
 
@@ -21,7 +21,7 @@ const resendOtpLimiter = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders:   false,
-  store:   new MongoRateLimitStore(),
+  store:   new MongoRateLimitStore("otp-resend"),
   message: { error: "Demasiados reenvíos. Intenta en 15 minutos." },
 });
 
@@ -29,5 +29,5 @@ export const adminRouter = Router();
 
 adminRouter.get("/",                requireAuth,                                                                    listAdminsHandler);
 adminRouter.post("/",               requireAuth, requireRootAdmin, createAdminLimiter, validate(createAdminSchema), createAdminHandler);
-adminRouter.post("/:id/resend-otp", requireAuth, resendOtpLimiter, validateObjectId(), requireRootAdmin,            resendOtpHandler);
+adminRouter.post("/:id/resend-otp", requireAuth, validateObjectId(), requireRootAdmin, resendOtpLimiter,            resendOtpHandler);
 adminRouter.delete("/:id",          requireAuth, validateObjectId(), requireRootAdmin,                              deleteAdminHandler);

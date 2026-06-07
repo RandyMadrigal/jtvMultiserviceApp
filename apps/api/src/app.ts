@@ -71,7 +71,7 @@ app.use(
     max: 120,
     standardHeaders: true,
     legacyHeaders: false,
-    store: new MongoRateLimitStore(),
+    store: new MongoRateLimitStore("global"),
     message: { error: "Demasiadas solicitudes. Intenta más tarde." },
   }),
 );

@@ -9,7 +9,7 @@ interface RateLimitDoc {
 
 const rateLimitSchema = new mongoose.Schema<RateLimitDoc>({
   key:       { type: String, required: true, unique: true },
-  hits:      { type: Number, default: 1 },
+  hits:      { type: Number, default: 0 }, // 0 + $inc(1) = 1 en el primer request
   expiresAt: { type: Date,   required: true },
 });
 rateLimitSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
@@ -21,28 +21,39 @@ const RateLimitModel: mongoose.Model<RateLimitDoc> =
 
 /**
  * MongoDB-backed store for express-rate-limit.
- * Works across multiple server instances and survives restarts.
- * No extra dependencies — uses the Mongoose connection already established.
+ * Cada instancia recibe un prefix único para aislar sus contadores
+ * de los de otros limiters que comparten la misma colección.
  */
 export class MongoRateLimitStore implements Store {
   private windowMs = 60_000;
+  private readonly _prefix: string;
+
+  constructor(prefix: string) {
+    this._prefix = prefix;
+  }
+
+  // Clave con prefijo: "login:192.168.1.1", "pwd-reset:192.168.1.1", etc.
+  private pk(key: string): string {
+    return `${this._prefix}:${key}`;
+  }
 
   init(options: Options): void {
     this.windowMs = options.windowMs;
   }
 
   async increment(key: string): Promise<ClientRateLimitInfo> {
+    const pk        = this.pk(key);
     const now       = new Date();
     const expiresAt = new Date(Date.now() + this.windowMs);
 
-    // Remove stale document if the TTL daemon (~60s cadence) hasn't cleaned it yet.
-    await RateLimitModel.deleteOne({ key, expiresAt: { $lt: now } });
+    // Elimina el documento si expiró antes de que el TTL daemon lo limpie
+    await RateLimitModel.deleteOne({ key: pk, expiresAt: { $lt: now } });
 
     const doc = await RateLimitModel.findOneAndUpdate(
-      { key },
+      { key: pk },
       {
         $inc:         { hits: 1 },
-        $setOnInsert: { expiresAt }, // preserves window boundary on subsequent hits
+        $setOnInsert: { expiresAt },
       },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     ).lean<RateLimitDoc>();
@@ -54,10 +65,10 @@ export class MongoRateLimitStore implements Store {
   }
 
   async decrement(key: string): Promise<void> {
-    await RateLimitModel.updateOne({ key }, { $inc: { hits: -1 } });
+    await RateLimitModel.updateOne({ key: this.pk(key) }, { $inc: { hits: -1 } });
   }
 
   async resetKey(key: string): Promise<void> {
-    await RateLimitModel.deleteOne({ key });
+    await RateLimitModel.deleteOne({ key: this.pk(key) });
   }
 }

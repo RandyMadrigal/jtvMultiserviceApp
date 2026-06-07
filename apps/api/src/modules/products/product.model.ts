@@ -36,8 +36,8 @@ const productSchema = new mongoose.Schema(
 productSchema.index({ category: 1, status: 1 });
 productSchema.index({ status: 1, createdAt: -1 });
 productSchema.index({ createdAt: -1 });
-// Búsqueda full-text por nombre y descripción
-productSchema.index({ name: "text", description: "text" });
+// Búsqueda por nombre — el índice sparse acelera $regex case-insensitive en catálogos < 50k docs
+productSchema.index({ name: 1 });
 
 export type ProductDoc = mongoose.InferSchemaType<typeof productSchema> & {
   _id: mongoose.Types.ObjectId;

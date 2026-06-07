@@ -11,4 +11,11 @@ export const productSchema = z.object({
   status: z.enum(["disponible", "agotado", "promocion"]).default("disponible"),
 });
 
+export const updateProductSchema = productSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "Se requiere al menos un campo para actualizar",
+  });
+
 export type ProductDto = z.infer<typeof productSchema>;
+export type UpdateProductDto = z.infer<typeof updateProductSchema>;

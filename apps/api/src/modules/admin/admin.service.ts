@@ -5,6 +5,7 @@ import { OtpModel } from "@/modules/auth/otp.model";
 import { sendOtpEmail } from "@/shared/utils/email";
 import { AppError } from "@/shared/errors/AppError";
 import { logger } from "@/shared/utils/logger";
+import { hashOtp } from "@/shared/utils/crypto";
 import type { CreateAdminDto } from "./admin.types";
 
 export async function listAdmins(page = 1, limit = 10) {
@@ -20,9 +21,14 @@ export async function createAdmin(dto: CreateAdminDto) {
   const hash  = await bcrypt.hash(dto.password, 12);
   const admin = await AdminModel.create({ email: dto.email, password: hash, verified: false });
 
-  const code = String(crypto.randomInt(100_000, 1_000_000));
+  const code     = String(crypto.randomInt(100_000, 1_000_000));
+  const codeHash = hashOtp(code);
   await OtpModel.deleteMany({ email: dto.email });
-  await OtpModel.create({ email: dto.email, code, expiresAt: new Date(Date.now() + 15 * 60 * 1000) });
+  await OtpModel.create({
+    email:     dto.email,
+    codeHash,
+    expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+  });
 
   let emailSent = false;
   try {
@@ -40,9 +46,14 @@ export async function resendOtp(adminId: string) {
   if (!admin) throw new AppError(404, "Administrador no encontrado");
   if (admin.verified) throw new AppError(400, "Este administrador ya está verificado");
 
-  const code = String(crypto.randomInt(100_000, 1_000_000));
+  const code     = String(crypto.randomInt(100_000, 1_000_000));
+  const codeHash = hashOtp(code);
   await OtpModel.deleteMany({ email: admin.email });
-  await OtpModel.create({ email: admin.email, code, expiresAt: new Date(Date.now() + 15 * 60 * 1000) });
+  await OtpModel.create({
+    email:     admin.email,
+    codeHash,
+    expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+  });
   await sendOtpEmail(admin.email, code);
 }
 

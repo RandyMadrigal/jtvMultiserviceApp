@@ -1,6 +1,7 @@
 import { CategoryModel } from "./category.model";
 import { ProductModel } from "@/modules/products/product.model";
 import { AppError } from "@/shared/errors/AppError";
+import { logger } from "@/shared/utils/logger";
 import type { CategoryDto } from "./categories.types";
 
 // Solo se usa en endpoints de admin (autenticados)
@@ -41,15 +42,23 @@ export async function updateCategory(id: string, dto: Partial<CategoryDto>) {
 }
 
 export async function deleteCategory(id: string) {
+  // Verificación previa: caso común (la categoría tiene productos). Evita delete+restore.
   const count = await ProductModel.countDocuments({ category: id });
   if (count > 0) {
-    throw new AppError(
-      409,
-      `No se puede eliminar: ${count} producto(s) pertenecen a esta categoría`,
-      "CATEGORY_HAS_PRODUCTS",
-    );
+    throw new AppError(409, `No se puede eliminar: ${count} producto(s) pertenecen a esta categoría`, "CATEGORY_HAS_PRODUCTS");
   }
 
   const doc = await CategoryModel.findByIdAndDelete(id);
   if (!doc) throw new AppError(404, "Categoría no encontrada");
+
+  // Re-verificación tras el delete para cerrar la ventana TOCTOU:
+  // si entre el countDocuments y el findByIdAndDelete se creó un producto con esta categoría,
+  // restauramos la categoría y rechazamos la operación.
+  const countAfter = await ProductModel.countDocuments({ category: id });
+  if (countAfter > 0) {
+    await CategoryModel.collection.insertOne(doc.toObject()).catch((err) =>
+      logger.error({ id, err }, "Error al restaurar categoría tras race condition"),
+    );
+    throw new AppError(409, `No se puede eliminar: ${countAfter} producto(s) pertenecen a esta categoría`, "CATEGORY_HAS_PRODUCTS");
+  }
 }
