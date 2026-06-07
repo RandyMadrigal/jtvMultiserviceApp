@@ -19,7 +19,8 @@ export async function initDefaultAdmin(): Promise<void> {
     return;
   }
 
-  const hash = await bcrypt.hash(env.ADMIN_PASSWORD, 12);
+  // process.env.ADMIN_PASSWORD está validado en env.ts al arrancar
+  const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD!, 12);
   // Upsert atómico — maneja race condition si múltiples instancias arrancan en paralelo
   await AdminModel.findOneAndUpdate(
     { email: env.ADMIN_EMAIL },

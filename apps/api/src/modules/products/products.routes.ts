@@ -3,7 +3,7 @@ import { requireAuth } from "@/shared/middleware/auth.middleware";
 import { validate } from "@/shared/middleware/validate.middleware";
 import { validateObjectId } from "@/shared/middleware/validateObjectId.middleware";
 import { parseImageFields, uploadToCloudinary } from "@/shared/middleware/upload.middleware";
-import { productSchema } from "./products.types";
+import { productSchema, updateProductSchema } from "./products.types";
 import { list, get, create, update, remove } from "./products.controller";
 
 export const productsRouter = Router();
@@ -28,7 +28,7 @@ productsRouter.put(
   validateObjectId(),
   parseImageFields,
   uploadToCloudinary,
-  validate(productSchema.partial()),
+  validate(updateProductSchema),
   update,
 );
 

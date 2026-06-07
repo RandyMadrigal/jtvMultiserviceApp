@@ -8,15 +8,27 @@ interface Props {
   onClose: () => void;
 }
 
+function validatePassword(pw: string): string {
+  if (pw.length < 8)          return "Mínimo 8 caracteres";
+  if (!/[A-Z]/.test(pw))      return "Debe contener al menos una letra mayúscula";
+  if (!/[0-9]/.test(pw))      return "Debe contener al menos un número";
+  if (!/[^A-Za-z0-9]/.test(pw)) return "Debe contener al menos un carácter especial";
+  return "";
+}
+
 export function CreateAdminModal({ onSuccess, onClose }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [pwError, setPwError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const pwValidation = validatePassword(password);
+    if (pwValidation) { setPwError(pwValidation); return; }
+    setPwError("");
     setError("");
     setSubmitting(true);
     try {
@@ -105,17 +117,19 @@ export function CreateAdminModal({ onSuccess, onClose }: Props) {
           <div>
             <label className="mb-1 block text-sm font-medium" htmlFor="password">
               Contraseña *{" "}
-              <span className="text-xs text-muted-foreground">(mín. 8 caracteres)</span>
+              <span className="text-xs text-muted-foreground">(mín. 8 caracteres, mayúscula, número y símbolo)</span>
             </label>
             <input
               id="password"
               type="password"
               required
-              minLength={8}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring/50"
+              onChange={(e) => { setPassword(e.target.value); setPwError(""); }}
+              className={`w-full rounded-md border bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring/50 ${pwError ? "border-destructive" : "border-input"}`}
             />
+            {pwError && (
+              <p className="mt-1 text-xs text-destructive">{pwError}</p>
+            )}
           </div>
 
           <p className="rounded-md bg-secondary/60 px-3 py-2 text-xs text-muted-foreground">

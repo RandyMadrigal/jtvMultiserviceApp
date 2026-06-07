@@ -15,6 +15,9 @@ const envSchema = z.object({
   // CORS — comma-separated list of allowed origins
   CORS_ORIGINS: z.string().default("http://localhost:5173"),
 
+  // URL pública del frontend — usada para construir enlaces en emails (reset de contraseña, etc.)
+  APP_URL: z.string().url("APP_URL debe ser una URL válida").default("http://localhost:5173"),
+
   // Database
   MONGODB_URI: z
     .string()
@@ -45,4 +48,7 @@ if (!parsed.success) {
   process.exit(1);
 }
 
-export const env = parsed.data;
+// ADMIN_PASSWORD validado pero no exportado — se lee via process.env en init.ts
+// para no exponer la credencial en el objeto env serializable
+const { ADMIN_PASSWORD: _adminPwd, ...safeEnv } = parsed.data;
+export const env = safeEnv;
