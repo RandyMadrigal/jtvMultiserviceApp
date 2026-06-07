@@ -1,4 +1,5 @@
 import axios from "axios";
+import { apiBase } from "@/shared/config/env";
 
 // Token guardado en memoria del módulo — invisible para XSS
 let accessToken: string | null = null;
@@ -12,7 +13,7 @@ export function setToken(token: string | null): void {
 }
 
 export const apiClient = axios.create({
-  baseURL: "/api",
+  baseURL: apiBase,
   withCredentials: true, // envía la cookie del refresh token
 });
 

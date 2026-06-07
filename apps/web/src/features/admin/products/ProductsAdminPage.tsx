@@ -10,7 +10,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { apiClient } from "../lib/api-client";
+import { toast } from "sonner";
+import { apiClient } from "@/shared/lib/api-client";
+import { extractError } from "@/shared/lib/extractError";
 import { ProductForm, type Product } from "./ProductForm";
 
 interface Category {
@@ -79,11 +81,11 @@ export function ProductsAdminPage() {
     setDeleting(id);
     try {
       await apiClient.delete(`/products/${id}`);
-      // Si era el último de la página y no es la primera, retroceder
+      toast.success("Producto eliminado");
       const nextPage = products.length === 1 && page > 1 ? page - 1 : page;
       await load(nextPage);
-    } catch {
-      alert("Error al eliminar el producto");
+    } catch (err) {
+      toast.error(extractError(err, "Error al eliminar el producto"));
     } finally {
       setDeleting(null);
     }
@@ -138,25 +140,22 @@ export function ProductsAdminPage() {
         </div>
       ) : (
         <>
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-secondary/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 text-left">Imagen</th>
                   <th className="px-4 py-3 text-left">Nombre</th>
-                  <th className="px-4 py-3 text-left">Categoría</th>
-                  <th className="px-4 py-3 text-left">Estado</th>
-                  <th className="px-4 py-3 text-left">Creado por</th>
+                  <th className="hidden md:table-cell px-4 py-3 text-left">Categoría</th>
+                  <th className="hidden sm:table-cell px-4 py-3 text-left">Estado</th>
+                  <th className="hidden lg:table-cell px-4 py-3 text-left">Creado por</th>
                   <th className="px-4 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {products.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="py-16 text-center text-muted-foreground"
-                    >
+                    <td colSpan={6} className="py-16 text-center text-muted-foreground">
                       No hay productos. Crea el primero.
                     </td>
                   </tr>
@@ -183,25 +182,28 @@ export function ProductsAdminPage() {
                             {p.description}
                           </p>
                         )}
+                        {/* Categoría + estado visible solo en mobile dentro del nombre */}
+                        <div className="mt-0.5 flex flex-wrap items-center gap-1.5 md:hidden">
+                          {p.category?.name && (
+                            <span className="text-xs text-muted-foreground">{p.category.name}</span>
+                          )}
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold sm:hidden ${STATUS_CLASS[p.status]}`}>
+                            {STATUS_LABEL[p.status]}
+                          </span>
+                        </div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
+                      <td className="hidden md:table-cell px-4 py-3 text-muted-foreground">
                         {p.category?.name}
                       </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_CLASS[p.status]}`}
-                        >
+                      <td className="hidden sm:table-cell px-4 py-3">
+                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_CLASS[p.status]}`}>
                           {STATUS_LABEL[p.status]}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="hidden lg:table-cell px-4 py-3">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <UserCircle className="h-3.5 w-3.5 shrink-0" />
-                          {p.createdBy?.email ? (
-                            p.createdBy.email.split("@")[0]
-                          ) : (
-                            <span className="italic">sistema</span>
-                          )}
+                          {p.createdBy?.email ? p.createdBy.email.split("@")[0] : <span className="italic">sistema</span>}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -209,7 +211,7 @@ export function ProductsAdminPage() {
                           <button
                             onClick={() => setEditing(p)}
                             className="rounded-md p-1.5 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
-                            title="Editar"
+                            aria-label="Editar"
                           >
                             <Pencil className="h-4 w-4" />
                           </button>
@@ -217,7 +219,7 @@ export function ProductsAdminPage() {
                             onClick={() => handleDelete(p._id)}
                             disabled={deleting === p._id}
                             className="rounded-md p-1.5 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive disabled:opacity-40"
-                            title="Eliminar"
+                            aria-label="Eliminar"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>

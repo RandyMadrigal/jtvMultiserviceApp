@@ -29,8 +29,6 @@ export async function createCategory(dto: CategoryDto, adminId: string) {
 }
 
 export async function updateCategory(id: string, dto: Partial<CategoryDto>) {
-  await getCategory(id); // valida existencia antes del update
-
   const doc = await CategoryModel.findByIdAndUpdate(id, dto, {
     new: true,
     runValidators: true,
@@ -38,12 +36,11 @@ export async function updateCategory(id: string, dto: Partial<CategoryDto>) {
     .populate(POPULATE_CREATED_BY)
     .lean();
 
-  return doc!;
+  if (!doc) throw new AppError(404, "Categoría no encontrada");
+  return doc;
 }
 
 export async function deleteCategory(id: string) {
-  await getCategory(id);
-
   const count = await ProductModel.countDocuments({ category: id });
   if (count > 0) {
     throw new AppError(
@@ -53,5 +50,6 @@ export async function deleteCategory(id: string) {
     );
   }
 
-  await CategoryModel.findByIdAndDelete(id);
+  const doc = await CategoryModel.findByIdAndDelete(id);
+  if (!doc) throw new AppError(404, "Categoría no encontrada");
 }

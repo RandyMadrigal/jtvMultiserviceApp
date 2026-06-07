@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth } from "@/shared/middleware/auth.middleware";
 import { validate } from "@/shared/middleware/validate.middleware";
+import { validateObjectId } from "@/shared/middleware/validateObjectId.middleware";
 import { parseImageFields, uploadToCloudinary } from "@/shared/middleware/upload.middleware";
 import { productSchema } from "./products.types";
 import { list, get, create, update, remove } from "./products.controller";
@@ -9,7 +10,7 @@ export const productsRouter = Router();
 
 // Público — el catálogo lee productos sin autenticación
 productsRouter.get("/", list);
-productsRouter.get("/:id", get);
+productsRouter.get("/:id", validateObjectId(), get);
 
 // Admin — JWT + subida de imágenes múltiples opcional
 productsRouter.post(
@@ -24,10 +25,11 @@ productsRouter.post(
 productsRouter.put(
   "/:id",
   requireAuth,
+  validateObjectId(),
   parseImageFields,
   uploadToCloudinary,
   validate(productSchema.partial()),
   update,
 );
 
-productsRouter.delete("/:id", requireAuth, remove);
+productsRouter.delete("/:id", requireAuth, validateObjectId(), remove);

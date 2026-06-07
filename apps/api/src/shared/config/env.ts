@@ -29,6 +29,10 @@ const envSchema = z.object({
   // Admin por defecto (solo se usa en el primer arranque, requerido)
   ADMIN_EMAIL:    z.string().email("ADMIN_EMAIL debe ser un email válido"),
   ADMIN_PASSWORD: z.string().min(8, "ADMIN_PASSWORD debe tener al menos 8 caracteres"),
+
+  // Resend — envío de emails transaccionales
+  RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY is required"),
+  RESEND_FROM:    z.string().email("RESEND_FROM debe ser un email válido"),
 });
 
 const parsed = envSchema.safeParse(process.env);

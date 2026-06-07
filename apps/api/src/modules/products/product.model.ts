@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true },
+  { timestamps: true, versionKey: false },
 );
 
 // Índices para queries frecuentes del catálogo público

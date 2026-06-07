@@ -8,11 +8,13 @@ import {
 } from "react";
 import axios from "axios";
 import { apiClient, setToken } from "./api-client";
+import { apiBase } from "@/shared/config/env";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  verifyOtp: (email: string, otp: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -25,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Al montar: intenta renovar la sesión con la cookie existente
   useEffect(() => {
     axios
-      .post("/api/auth/refresh", {}, { withCredentials: true })
+      .post(`${apiBase}/auth/refresh`, {}, { withCredentials: true })
       .then(({ data }) => {
         setToken(data.accessToken);
         setIsAuthenticated(true);
@@ -43,6 +45,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(true);
   }, []);
 
+  const verifyOtp = useCallback(async (email: string, otp: string) => {
+    const { data } = await apiClient.post("/auth/verify-otp", { email, otp });
+    setToken(data.accessToken);
+    setIsAuthenticated(true);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await apiClient.post("/auth/logout");
@@ -53,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, verifyOtp, logout }}>
       {children}
     </AuthContext.Provider>
   );

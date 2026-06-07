@@ -8,7 +8,7 @@ import {
   Plus,
   Star,
 } from "lucide-react";
-import { apiClient } from "../lib/api-client";
+import { apiClient } from "@/shared/lib/api-client";
 
 /* ── Tipos ─────────────────────────────────────────────────────────────────── */
 type Status = "disponible" | "agotado" | "promocion";
@@ -437,7 +437,7 @@ export function ProductForm({ product, categories: categoriesProp, onSuccess, on
                         : "border-border"
                 }`}
               >
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row">
                   {/* ── Imagen ── */}
                   <div className="relative shrink-0">
                     <div className="relative h-24 w-24 overflow-hidden rounded-lg bg-secondary">
@@ -540,7 +540,7 @@ export function ProductForm({ product, categories: categoriesProp, onSuccess, on
                     />
 
                     {/* Categoría + Estado */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div>
                         <label className="mb-0.5 block text-xs font-medium text-muted-foreground">
                           Categoría *

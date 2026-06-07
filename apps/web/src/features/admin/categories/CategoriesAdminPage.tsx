@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X, Check, UserCircle } from "lucide-react";
-import { apiClient } from "../lib/api-client";
+import { toast } from "sonner";
+import { apiClient } from "@/shared/lib/api-client";
+import { extractError } from "@/shared/lib/extractError";
 
 interface Category {
-  _id:       string;
-  name:      string;
+  _id: string;
+  name: string;
   createdBy?: { _id: string; email: string } | null;
 }
 
 export function CategoriesAdminPage() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading,    setLoading]    = useState(true);
-  const [creating,   setCreating]   = useState(false);
-  const [editingId,  setEditingId]  = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const [name,       setName]       = useState("");
+  const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error,      setError]      = useState("");
+  const [error, setError] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -28,36 +30,49 @@ export function CategoriesAdminPage() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const openCreate = () => {
-    setName(""); setError("");
+    setName("");
+    setError("");
     setEditingId(null);
     setCreating(true);
   };
 
   const openEdit = (c: Category) => {
-    setName(c.name); setError("");
+    setName(c.name);
+    setError("");
     setCreating(false);
     setEditingId(c._id);
   };
 
-  const cancel = () => { setCreating(false); setEditingId(null); setError(""); };
+  const cancel = () => {
+    setCreating(false);
+    setEditingId(null);
+    setError("");
+  };
 
   const handleSave = async () => {
-    if (!name.trim()) { setError("El nombre es requerido"); return; }
-    setSubmitting(true); setError("");
+    if (!name.trim()) {
+      setError("El nombre es requerido");
+      return;
+    }
+    setSubmitting(true);
+    setError("");
     try {
       if (editingId) {
         await apiClient.put(`/categories/${editingId}`, { name });
+        toast.success("Categoría actualizada");
       } else {
         await apiClient.post("/categories", { name });
+        toast.success("Categoría creada");
       }
       cancel();
       await load();
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      setError(msg ?? "Error al guardar la categoría");
+      setError(extractError(err, "Error al guardar la categoría"));
     } finally {
       setSubmitting(false);
     }
@@ -68,9 +83,9 @@ export function CategoriesAdminPage() {
     try {
       await apiClient.delete(`/categories/${id}`);
       setCategories((prev) => prev.filter((c) => c._id !== id));
+      toast.success("Categoría eliminada");
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      alert(msg ?? "Error al eliminar la categoría");
+      toast.error(extractError(err, "Error al eliminar la categoría"));
     }
   };
 
@@ -84,7 +99,9 @@ export function CategoriesAdminPage() {
             value={name}
             maxLength={80}
             onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+            }}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50"
           />
           {error && <p className="text-xs text-destructive">{error}</p>}
@@ -92,12 +109,17 @@ export function CategoriesAdminPage() {
       </td>
       <td className="px-4 py-3">
         <div className="flex justify-end gap-2">
-          <button onClick={cancel}
-            className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary">
+          <button
+            onClick={cancel}
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary"
+          >
             <X className="h-4 w-4" />
           </button>
-          <button onClick={handleSave} disabled={submitting}
-            className="rounded-md p-1.5 text-primary hover:bg-primary/10 disabled:opacity-40">
+          <button
+            onClick={handleSave}
+            disabled={submitting}
+            className="rounded-md p-1.5 text-primary hover:bg-primary/10 disabled:opacity-40"
+          >
             <Check className="h-4 w-4" />
           </button>
         </div>
@@ -110,7 +132,9 @@ export function CategoriesAdminPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Categorías</h1>
-          <p className="text-sm text-muted-foreground">{categories.length} categoría(s) creada(s)</p>
+          <p className="text-sm text-muted-foreground">
+            {categories.length} categoría(s) creada(s)
+          </p>
         </div>
         <button
           onClick={openCreate}
@@ -126,7 +150,7 @@ export function CategoriesAdminPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="overflow-x-auto rounded-xl border border-border bg-card">
           <table className="w-full text-sm">
             <thead className="border-b border-border bg-secondary/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               <tr>
@@ -139,7 +163,10 @@ export function CategoriesAdminPage() {
               {creating && <InlineForm />}
               {categories.length === 0 && !creating ? (
                 <tr>
-                  <td colSpan={3} className="py-16 text-center text-muted-foreground">
+                  <td
+                    colSpan={3}
+                    className="py-16 text-center text-muted-foreground"
+                  >
                     No hay categorías. Crea la primera.
                   </td>
                 </tr>
@@ -153,9 +180,11 @@ export function CategoriesAdminPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <UserCircle className="h-3.5 w-3.5 shrink-0" />
-                          {c.createdBy?.email
-                            ? c.createdBy.email.split("@")[0]
-                            : <span className="italic">sistema</span>}
+                          {c.createdBy?.email ? (
+                            c.createdBy.email.split("@")[0]
+                          ) : (
+                            <span className="italic">Admin</span>
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3">

@@ -17,6 +17,9 @@ import { adminRouter } from "@/modules/admin/admin.routes";
 
 const app = express();
 
+// Necesario para que req.ip refleje el cliente real detrás del proxy de Vercel/nginx
+app.set("trust proxy", 1);
+
 // ── Request ID (debe ir primero para correlacionar todos los logs) ────────────
 app.use(requestIdMiddleware);
 
@@ -25,23 +28,40 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        imgSrc: ["'self'", "https://res.cloudinary.com", "data:"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        frameSrc: ["'none'"],
+        defaultSrc:              ["'self'"],
+        imgSrc:                  ["'self'", "https://res.cloudinary.com", "data:"],
+        scriptSrc:               ["'self'"],
+        styleSrc:                ["'self'", "'unsafe-inline'"],
+        connectSrc:              ["'self'"],
+        fontSrc:                 ["'self'"],
+        objectSrc:               ["'none'"],
+        frameSrc:                ["'none'"],
         upgradeInsecureRequests: env.NODE_ENV === "production" ? [] : null,
       },
     },
+    // HSTS: fuerza HTTPS por 1 año en producción
+    hsts: env.NODE_ENV === "production"
+      ? { maxAge: 31_536_000, includeSubDomains: true, preload: true }
+      : false,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   }),
 );
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = env.CORS_ORIGINS.split(",").map((o) => o.trim());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+const allowedOrigins = env.CORS_ORIGINS.split(",").map((o) => o.trim()).filter(Boolean);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // En desarrollo se permiten peticiones sin origen (Postman, curl)
+      if (!origin && env.NODE_ENV !== "production") return callback(null, true);
+      if (origin && allowedOrigins.includes(origin))  return callback(null, true);
+      callback(new Error("Origen no permitido por CORS"));
+    },
+    credentials:    true,
+    methods:        ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 // ── Global rate limit ────────────────────────────────────────────────────────
 // Store en MongoDB: persiste entre reinicios y funciona con múltiples instancias.
@@ -57,7 +77,15 @@ app.use(
 );
 
 // ── Logging ──────────────────────────────────────────────────────────────────
-app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
+// Token personalizado: incluye req.requestId en cada línea de log para correlación
+morgan.token("req-id", (req) => (req as unknown as { requestId?: string }).requestId ?? "-");
+app.use(
+  morgan(
+    env.NODE_ENV === "production"
+      ? ':req-id :remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
+      : ":req-id :method :url :status :response-time ms",
+  ),
+);
 
 // ── Body + Cookie parsing ────────────────────────────────────────────────────
 app.use(express.json({ limit: "1mb" }));
@@ -87,11 +115,13 @@ app.get("/health", async (req, res) => {
 
   const dbState = mongoose.connection.readyState;
   const dbHealthy = dbState === 1;
+  const authenticated = !!process.env.HEALTH_TOKEN; // ya verificado arriba si existe
   const checks = {
-    status: dbHealthy ? "ok" : "degraded",
-    db: dbHealthy ? "ok" : "error",
-    uptime: Math.floor(process.uptime()),
+    status:    dbHealthy ? "ok" : "degraded",
+    db:        dbHealthy ? "ok" : "error",
     timestamp: new Date().toISOString(),
+    // uptime solo para monitoreo autenticado — evita exponer patrones de despliegue
+    ...(authenticated && { uptime: Math.floor(process.uptime()) }),
   };
   res.status(dbHealthy ? 200 : 503).json(checks);
 });

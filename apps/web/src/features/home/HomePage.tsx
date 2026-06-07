@@ -97,7 +97,9 @@ export function HomePage() {
   useEffect(() => {
     const controller = new AbortController();
     api
-      .get<PaginatedProducts>("/products?limit=6&page=1", { signal: controller.signal })
+      .get<PaginatedProducts>("/products?limit=6&page=1", {
+        signal: controller.signal,
+      })
       .then(({ data }) => setFeatured(data.items))
       .catch((err) => {
         if (!axios.isCancel(err)) setFeatured([]);
@@ -405,7 +407,11 @@ export function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div
             ref={ctaRef}
-            className={ctaInView ? "animate-in fade-in zoom-in-95 duration-700 fill-mode-both" : "opacity-0"}
+            className={
+              ctaInView
+                ? "animate-in fade-in zoom-in-95 duration-700 fill-mode-both"
+                : "opacity-0"
+            }
           >
             <QuoteCTA
               eyebrow="Cotiza gratis"
