@@ -9,6 +9,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/shared/lib/auth.context";
 import { apiClient } from "@/shared/lib/api-client";
 import { extractError } from "@/shared/lib/extractError";
 import { CreateAdminModal } from "./CreateAdminModal";
@@ -31,6 +32,9 @@ interface PaginatedAdmins {
 const PAGE_SIZE = 10;
 
 export function AdminsPage() {
+  const { user } = useAuth();
+  const isRoot = user?.isRoot ?? false;
+
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -106,12 +110,14 @@ export function AdminsPage() {
               : `${total} cuenta${total !== 1 ? "s" : ""} registrada${total !== 1 ? "s" : ""}`}
           </p>
         </div>
-        <button
-          onClick={() => setCreating(true)}
-          className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
-        >
-          <Plus className="h-4 w-4" /> Nuevo administrador
-        </button>
+        {isRoot && (
+          <button
+            onClick={() => setCreating(true)}
+            className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" /> Nuevo administrador
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -171,7 +177,7 @@ export function AdminsPage() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          {!a.verified && !a.isRoot && (
+                          {isRoot && !a.verified && !a.isRoot && (
                             <button
                               onClick={() => handleResendOtp(a._id, a.email)}
                               disabled={resendingId === a._id}
@@ -182,7 +188,7 @@ export function AdminsPage() {
                               <span className="hidden sm:inline">Reenviar OTP</span>
                             </button>
                           )}
-                          {!a.isRoot && (
+                          {isRoot && !a.isRoot && (
                             <button
                               onClick={() => {
                                 setDeleteError(null);
