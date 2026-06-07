@@ -1,19 +1,45 @@
-# JTV Multiservice — Plataforma de Imprenta y Servicios Gráficos
+# JTV Multiservice
 
-Aplicación web full-stack para la gestión y exhibición del catálogo de productos de JTV Multiservice. Incluye un sitio público para clientes y un panel de administración para la gestión de productos, categorías e imágenes.
+Plataforma de Imprenta y Servicios Gráficos — aplicación web full-stack para la gestión y exhibición del catálogo de productos de JTV Multiservice. Incluye un sitio público para clientes y un panel de administración para la gestión de productos, categorías, imágenes y usuarios administradores.
 
-## Stack tecnológico
+## Descripción
 
-| Capa | Tecnología |
-|---|---|
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4, React Router v7 |
-| Backend | Node.js, Express, TypeScript |
-| Base de datos | MongoDB + Mongoose |
-| Almacenamiento de imágenes | Cloudinary |
-| Autenticación | JWT (access token en memoria) + Refresh Token (httpOnly cookie) |
-| Monorepo | npm workspaces |
+JTV Multiservice es una empresa de imprenta y servicios gráficos. Esta aplicación centraliza su presencia digital en dos frentes:
 
-## Estructura del proyecto
+- **Sitio público** — catálogo de productos, servicios ofrecidos, galería de trabajos realizados y contacto directo vía WhatsApp.
+- **Panel de administración** — herramienta interna para que el equipo de JTV gestione el catálogo (productos, categorías, imágenes) y las cuentas de administrador, sin depender de terceros.
+
+## Características
+
+**Sitio público**
+
+- Catálogo completo con filtros por categoría y búsqueda
+- Galería de trabajos realizados
+- Información de servicios y de la empresa
+- Contacto directo vía WhatsApp
+
+**Autenticación y seguridad**
+
+- Login con JWT (access token) + refresh token
+- Verificación en dos pasos por correo (OTP) para nuevas cuentas administradoras, con enlace directo a la página de acceso
+- Recuperación de contraseña vía correo
+- Blacklist de tokens revocados, rate limiting, cabeceras de seguridad (Helmet) y CORS restringido por origen
+
+## Tecnologías
+
+| Capa                       | Tecnología                                                                       |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| Frontend                   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router v7                     |
+| Backend                    | Node.js, Express, TypeScript                                                     |
+| Base de datos              | MongoDB + Mongoose                                                               |
+| Almacenamiento de imágenes | Cloudinary                                                                       |
+| Envío de correos           | Resend                                                                           |
+| Autenticación              | JWT (access token en memoria) + Refresh Token (httpOnly cookie) + OTP por correo |
+| Monorepo                   | npm workspaces                                                                   |
+
+## Arquitectura
+
+Monorepo con `apps/web` (frontend) y `apps/api` (backend), sin código compilado compartido — solo `node_modules` se hospeda en la raíz.
 
 ```
 jtvmultiserviceApp/
@@ -32,7 +58,7 @@ jtvmultiserviceApp/
 │   │       │       ├── products/
 │   │       │       ├── categories/
 │   │       │       └── admins/
-│   │       └── shared/             # Componentes y utilidades compartidas
+│   │       └── shared/             # Componentes, hooks y utilidades compartidas
 │   └── api/                        # Backend (Express)
 │       └── src/
 │           ├── modules/            # Módulos de dominio
@@ -40,159 +66,82 @@ jtvmultiserviceApp/
 │           │   ├── products/
 │           │   ├── categories/
 │           │   └── admin/
-│           └── shared/             # Middlewares y servicios compartidos
+│           └── shared/             # Middlewares, config y servicios compartidos
 │               ├── middleware/
 │               ├── database/
-│               └── config/
+│               ├── config/
+│               └── storage/
 └── package.json                    # Workspace root
 ```
 
-## Requisitos previos
+Cada módulo del backend sigue la misma estructura autocontenida: `*.routes.ts` (router de Express), `*.controller.ts` (manejo de req/res), `*.service.ts` (lógica de negocio + acceso a datos), `*.model.ts` (esquema de Mongoose) y `*.schema.ts` (validación con Zod).
 
-- Node.js 20+
-- Cuenta en [MongoDB Atlas](https://cloud.mongodb.com) o instancia local de MongoDB
-- Cuenta en [Cloudinary](https://cloudinary.com)
+El frontend admin usa autenticación protegida vía `<ProtectedRoute>` y un `AuthProvider` que mantiene el access token en memoria (nunca en `localStorage`) para reducir la exposición a XSS.
 
-## Instalación
-
-```bash
-# Clonar el repositorio
-git clone <url-del-repositorio>
-cd jtvmultiserviceApp
-
-# Instalar todas las dependencias (frontend + backend)
-npm install
-```
-
-## Configuración
+## Variables de entorno
 
 ### Backend — `apps/api/.env`
 
-Crea el archivo copiando el ejemplo:
-
-```bash
-cp apps/api/.env.example apps/api/.env
-```
-
-Edita `apps/api/.env` con tus credenciales:
-
 ```env
-PORT=3000
+PORT=
 NODE_ENV=development
 
-# JWT — genera una clave segura (mín. 32 caracteres)
-# node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-JWT_SECRET=tu_clave_secreta_de_al_menos_32_caracteres
-JWT_EXPIRES_IN=15m
+# JWT — clave segura de mínimo 32 caracteres
+JWT_SECRET=
+JWT_EXPIRES_IN=
 
-CORS_ORIGINS=http://localhost:5173
+CORS_ORIGINS=
+
+# URL pública del frontend (usada en enlaces de correos: OTP, reset de contraseña)
+APP_URL=
 
 # MongoDB
-MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@cluster.mongodb.net/jtv
+MONGODB_URI=
 
-# Cloudinary — https://console.cloudinary.com
-CLOUDINARY_CLOUD_NAME=tu_cloud_name
-CLOUDINARY_API_KEY=tu_api_key
-CLOUDINARY_API_SECRET=tu_api_secret
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 
-# Administrador inicial (se crea automáticamente en el primer arranque)
-ADMIN_EMAIL=admin@ejemplo.com
-ADMIN_PASSWORD=TuContraseñaSegura123!
+# Resend (envío de correos transaccionales)
+RESEND_API_KEY=
+RESEND_FROM=
+
+# Administrador raíz (se crea automáticamente en el primer arranque)
+ADMIN_EMAIL=
+ADMIN_PASSWORD=
 ```
 
-### Frontend — `apps/web/.env.local`
+### Frontend — `apps/web/.env`
 
 ```env
-VITE_WHATSAPP_NUMBER=10000000000
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=
+VITE_WHATSAPP_NUMBER=
 ```
 
-## Ejecutar el proyecto
+> En desarrollo, el servidor de Vite proxea `/api/*` hacia `http://localhost:3000`, por lo que el frontend siempre llama a `/api/...` sin importar el entorno.
 
-```bash
-# Frontend (http://localhost:5173)
-npm run dev
+## Scripts
 
-# Backend (http://localhost:3000)
-npm run dev:api
-```
+Ejecutar desde la raíz del repositorio:
 
-> En el **primer arranque** del backend, se crea automáticamente el administrador definido en `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
+| Script              | Descripción                                      |
+| ------------------- | ------------------------------------------------ |
+| `npm run dev`       | Inicia frontend (Vite, puerto 5173)              |
+| `npm run dev:api`   | Inicia backend en modo watch (tsx, puerto 3000)  |
+| `npm run build`     | Compila el frontend (Vite → `dist/`)             |
+| `npm run build:api` | Compila el backend (tsc → `dist/`)               |
+| `npm run preview`   | Previsualiza el build de producción del frontend |
+| `npm run lint`      | Ejecuta el linter sobre el frontend              |
 
-## Sitio público
+## Estado
 
-| Ruta | Descripción |
-|---|---|
-| `/` | Página de inicio con productos destacados |
-| `/catalogo` | Catálogo completo con filtros por categoría y búsqueda |
-| `/servicios` | Lista de servicios ofrecidos |
-| `/galeria` | Galería de trabajos realizados |
-| `/nosotros` | Información de la empresa |
-| `/contacto` | Formulario de contacto vía WhatsApp |
+En desarrollo activo. Backend desplegado en **Railway** y frontend en **Vercel**.
 
-## Panel de administración
+## Autor
 
-Accede en `/admin/login` con las credenciales configuradas.
+**Randy Madrigal** — [GitHub](https://github.com/RandyMadrigal)
 
-| Ruta | Descripción |
-|---|---|
-| `/admin/products` | Gestión de productos (crear, editar, eliminar) |
-| `/admin/categories` | Gestión de categorías |
-| `/admin/admins` | Gestión de usuarios administradores |
+## Licencia
 
-## API Endpoints
-
-### Autenticación
-```
-POST   /api/auth/login      Iniciar sesión
-POST   /api/auth/refresh    Renovar access token (usa cookie)
-POST   /api/auth/logout     Cerrar sesión
-GET    /api/auth/me         Información del admin autenticado
-```
-
-### Productos (público: GET, admin: resto)
-```
-GET    /api/products         Listar todos
-GET    /api/products/:id     Obtener uno
-POST   /api/products         Crear (multipart/form-data)
-PUT    /api/products/:id     Editar (multipart/form-data)
-DELETE /api/products/:id     Eliminar
-```
-
-### Categorías (público: GET, admin: resto)
-```
-GET    /api/categories       Listar todas
-GET    /api/categories/:id   Obtener una
-POST   /api/categories       Crear
-PUT    /api/categories/:id   Editar
-DELETE /api/categories/:id   Eliminar (falla si tiene productos)
-```
-
-### Administradores (requiere JWT)
-```
-GET    /api/admin            Listar administradores
-POST   /api/admin            Crear administrador
-```
-
-## Seguridad
-
-- **Access token** — JWT de 15 minutos almacenado en memoria (no localStorage)
-- **Refresh token** — token aleatorio de 7 días en cookie httpOnly
-- **Blacklist** — los tokens revocados se invalidan inmediatamente al hacer logout
-- **Rate limiting** — límite global de 120 req/min y 10 intentos de login cada 15 min
-- **Helmet** — cabeceras HTTP de seguridad
-- **CORS** — solo orígenes configurados en `CORS_ORIGINS`
-- **Imágenes** — compresión en frontend (canvas) + optimización en Cloudinary (`q_auto,f_auto`)
-
-## Producción
-
-```bash
-# Build del frontend
-npm run build
-
-# Build del backend
-npm run build:api
-
-# Iniciar backend compilado
-npm run start:api
-```
+Privado — Propiedad de JTV Multiservice. Todos los derechos reservados.
