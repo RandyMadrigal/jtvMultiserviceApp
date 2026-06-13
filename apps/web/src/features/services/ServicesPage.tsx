@@ -20,6 +20,14 @@ const categories = [
     color: "from-[#0099D9] to-[#0077B6]",
     services: [
       {
+        name: "Cajas personalizadas",
+        desc: "Packaging a medida con tu diseño y logo corporativo.",
+      },
+      {
+        name: "Stickers y etiquetas en vinil",
+        desc: "Troquelado, holográfico, adhesivo o resistente al agua.",
+      },
+      {
         name: "Tarjetas de presentación",
         desc: "Diseño e impresión en papel premium con acabados especiales.",
       },
@@ -39,10 +47,7 @@ const categories = [
         name: "Sobres y papel membretado",
         desc: "Identidad corporativa completa con tu logo y datos.",
       },
-      {
-        name: "Stickers y etiquetas en vinil",
-        desc: "Troquelado, holográfico, adhesivo o resistente al agua.",
-      },
+
       {
         name: "Talonarios",
         desc: "En papel autocopiante o simple para control de ventas.",
@@ -81,10 +86,6 @@ const categories = [
       {
         name: "Viniles decorativos y promocionales",
         desc: "Corte e instalación de vinilo para cualquier superficie.",
-      },
-      {
-        name: "Cajas personalizadas",
-        desc: "Packaging a medida con tu diseño y logo corporativo.",
       },
       {
         name: "Rotulación",
@@ -151,7 +152,6 @@ const categories = [
   },
 ];
 
-
 export function ServicesPage() {
   return (
     <Layout>
@@ -174,8 +174,7 @@ export function ServicesPage() {
             Servicios
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground animate-in fade-in duration-700 delay-200 fill-mode-both">
-            Desde una tarjeta hasta una valla publicitaria — cualquier idea, la
-            imprimimos con la calidad que mereces.
+            Creamos e imprimimos tus ideas con la calidad que mereces.
           </p>
         </div>
       </section>
@@ -255,7 +254,8 @@ export function ServicesPage() {
                     ¿No ves lo que buscas?
                   </h2>
                   <p className="mt-1.5 text-white/65">
-                    Hacemos trabajos personalizados — pregúntanos sin compromiso.
+                    Hacemos trabajos personalizados — pregúntanos sin
+                    compromiso.
                   </p>
                 </div>
                 <Link
