@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 const stats = [
   {
     icon: Users,
-    value: "500+",
+    value: "100+",
     label: "Clientes satisfechos",
     color: "from-[#0099D9] to-[#0077B6]",
   },
@@ -64,7 +64,7 @@ export function AboutPage() {
             Quiénes somos
           </span>
           <h1 className="mt-2 text-4xl font-bold md:text-5xl animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100 fill-mode-both">
-            Sobre JTV Multiservice
+            JTV MULTISERVICE
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground animate-in fade-in duration-700 delay-200 fill-mode-both">
             JTV MULTI-SERVICE es una empresa dedicada a brindar servicios de
@@ -92,13 +92,15 @@ export function AboutPage() {
                 <div className="mb-4 inline-grid h-11 w-11 place-items-center rounded-xl bg-gradient-blue text-white shadow-glass">
                   <Target className="h-5 w-5" />
                 </div>
-                <h2 className="text-2xl font-bold md:text-3xl">Nuestra misión</h2>
+                <h2 className="text-2xl font-bold md:text-3xl">
+                  Nuestra misión
+                </h2>
                 <p className="mt-4 leading-relaxed text-muted-foreground">
                   Ofrecer servicios de impresión y soluciones gráficas de alto
                   impacto que ayuden a nuestros clientes a comunicar su marca,
                   alcanzar sus objetivos y destacarse en el mercado, con calidad
-                  garantizada, entregas puntuales y atención personalizada en cada
-                  proyecto.
+                  garantizada, entregas puntuales y atención personalizada en
+                  cada proyecto.
                 </p>
               </div>
             </div>
@@ -118,13 +120,15 @@ export function AboutPage() {
                 <div className="mb-4 inline-grid h-11 w-11 place-items-center rounded-xl bg-gradient-magenta text-white shadow-glass">
                   <Award className="h-5 w-5" />
                 </div>
-                <h2 className="text-2xl font-bold md:text-3xl">Nuestra visión</h2>
+                <h2 className="text-2xl font-bold md:text-3xl">
+                  Nuestra visión
+                </h2>
                 <p className="mt-4 leading-relaxed text-muted-foreground">
                   Ser la empresa de referencia en impresión y diseño gráfico en
                   Santo Domingo, reconocida por la excelencia en cada pieza que
                   producimos, la fidelidad de nuestros clientes y nuestra
-                  capacidad de adaptarnos a las necesidades gráficas de cualquier
-                  sector.
+                  capacidad de adaptarnos a las necesidades gráficas de
+                  cualquier sector.
                 </p>
               </div>
             </div>
@@ -192,7 +196,10 @@ export function AboutPage() {
               </p>
               <ul className="mt-7 space-y-3">
                 {values.map((v) => (
-                  <li key={v} className="flex items-center justify-center gap-3">
+                  <li
+                    key={v}
+                    className="flex items-center justify-center gap-3"
+                  >
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-white">
                       <CheckCircle className="h-3.5 w-3.5" />
                     </span>

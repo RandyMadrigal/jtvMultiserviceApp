@@ -24,7 +24,7 @@ const services = [
   {
     icon: Printer,
     label: "Impresión General",
-    desc: "Tarjetas, volantes, brochures, afiches, carpetas corporativas, sobres y talonarios.",
+    desc: "Tarjetas, volantes, brochures, afiches, carpetas corporativas, sobres, talonarios y más.",
     color: "from-[#0099D9] to-[#0077B6]",
   },
   {
@@ -139,19 +139,14 @@ export function HomePage() {
               Imprenta · Diseño · Producción
             </span>
 
-            <h1 className="mt-6 text-balance text-5xl font-extrabold leading-[1.02] tracking-tight md:text-6xl lg:text-7xl animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 fill-mode-both">
-              Damos vida a <br className="hidden md:block" />
-              tus ideas{" "}
-              <span className="text-gradient-brand">
-                en tinta
-                <br className="hidden md:block" /> y color.
-              </span>
+            <h1 className="mt-6 text-balance text-5xl font-extrabold leading-[1.02] tracking-tight md:text-5xl lg:text-6xl animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 fill-mode-both">
+              TU SOLUCIÓN <br className="hidden md:block" />
+              <span className="text-gradient-brand">GRAFICA.</span>
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-relaxed text-white/65 md:text-lg animate-in fade-in duration-700 delay-300 fill-mode-both">
               En JTV Multiservice transformamos tus diseños en productos
-              impresos de alta calidad. Desde una tarjeta de presentación hasta
-              un banner gigante.
+              impresos de alta calidad.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-500 fill-mode-both">
@@ -210,9 +205,6 @@ export function HomePage() {
           <div
             className={`mx-auto max-w-2xl text-center ${fadeUp(servicesInView)}`}
           >
-            <span className="text-xs font-semibold uppercase tracking-widest text-primary">
-              Lo que hacemos
-            </span>
             <h2 className="mt-3 text-3xl font-bold text-balance md:text-4xl">
               Servicios que
               <span className="text-gradient-brand"> transforman</span> tu marca
