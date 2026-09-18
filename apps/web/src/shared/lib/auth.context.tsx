@@ -24,6 +24,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+let initialRefresh: Promise<{ data: { accessToken: string } }> | null = null;
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -42,8 +44,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Al montar: intenta renovar la sesión con la cookie existente
   useEffect(() => {
-    axios
-      .post(`${apiBase}/auth/refresh`, {}, { withCredentials: true })
+    // El refresh token es de un solo uso: StrictMode ejecuta este efecto dos veces en dev,
+    // así que ambas ejecuciones comparten la misma petición en vez de enviar dos.
+    initialRefresh ??= axios
+      .post<{ accessToken: string }>(`${apiBase}/auth/refresh`, {}, { withCredentials: true })
+      .finally(() => {
+        initialRefresh = null;
+      });
+
+    initialRefresh
       .then(async ({ data }) => {
         setToken(data.accessToken);
         setIsAuthenticated(true);

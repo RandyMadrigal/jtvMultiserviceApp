@@ -86,27 +86,44 @@ export async function getProduct(id: string) {
   return doc;
 }
 
-export async function createProduct(dto: ProductDto, adminId: string, images: ImageItem[]) {
-  const categoryExists = await CategoryModel.exists({ _id: dto.category });
-  if (!categoryExists) throw new AppError(404, "Categoría no encontrada");
+// Borra de Cloudinary imágenes ya subidas cuando la operación falla después del upload
+function discardUploadedImages(images: ImageItem[] | undefined): void {
+  if (!images?.length) return;
+  Promise.all(images.map((img) => cloudinary.uploader.destroy(img.public_id))).catch(
+    (cleanupErr) => logger.error({ cleanupErr }, "Error al limpiar imágenes huérfanas de Cloudinary"),
+  );
+}
 
-  let doc;
+export async function createProduct(dto: ProductDto, adminId: string, images: ImageItem[]) {
   try {
-    doc = await ProductModel.create({ ...dto, createdBy: adminId, images });
+    const categoryExists = await CategoryModel.exists({ _id: dto.category });
+    if (!categoryExists) throw new AppError(404, "Categoría no encontrada");
+
+    const doc  = await ProductModel.create({ ...dto, createdBy: adminId, images });
+    const full = (await doc.populate([POPULATE_CATEGORY, POPULATE_CREATED_BY])).toObject();
+    return sanitizeImages(full as Record<string, unknown>);
   } catch (err) {
-    // I-4: Si la inserción en DB falla, limpiar las imágenes ya subidas a Cloudinary
-    if (images.length > 0) {
-      Promise.all(images.map((img) => cloudinary.uploader.destroy(img.public_id))).catch(
-        (cleanupErr) => logger.error({ cleanupErr }, "Error al limpiar imágenes huérfanas de Cloudinary"),
-      );
-    }
+    // Cualquier fallo tras el upload (categoría inexistente, error de DB) deja imágenes huérfanas
+    discardUploadedImages(images);
     throw err;
   }
-  const full = (await doc.populate([POPULATE_CATEGORY, POPULATE_CREATED_BY])).toObject();
-  return sanitizeImages(full as Record<string, unknown>);
 }
 
 export async function updateProduct(
+  id: string,
+  dto: Partial<ProductDto>,
+  newImages?: ImageItem[],
+) {
+  try {
+    return await applyProductUpdate(id, dto, newImages);
+  } catch (err) {
+    // Si la actualización falla, las imágenes nuevas ya subidas quedarían huérfanas
+    discardUploadedImages(newImages);
+    throw err;
+  }
+}
+
+async function applyProductUpdate(
   id: string,
   dto: Partial<ProductDto>,
   newImages?: ImageItem[],

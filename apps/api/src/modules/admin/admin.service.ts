@@ -2,6 +2,8 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { AdminModel } from "./admin.model";
 import { OtpModel } from "@/modules/auth/otp.model";
+import { RefreshToken } from "@/modules/auth/refresh-token.model";
+import { PasswordReset } from "@/modules/auth/password-reset.model";
 import { sendOtpEmail } from "@/shared/utils/email";
 import { AppError } from "@/shared/errors/AppError";
 import { logger } from "@/shared/utils/logger";
@@ -67,4 +69,11 @@ export async function deleteAdmin(targetId: string, requesterId: string) {
   if (target.isRoot) throw new AppError(400, "No se puede eliminar al administrador raíz");
 
   await AdminModel.deleteOne({ _id: targetId });
+
+  // Limpia sesiones y códigos pendientes del admin eliminado
+  await Promise.all([
+    RefreshToken.deleteMany({ adminId: targetId }),
+    OtpModel.deleteMany({ email: target.email }),
+    PasswordReset.deleteMany({ adminId: targetId }),
+  ]);
 }

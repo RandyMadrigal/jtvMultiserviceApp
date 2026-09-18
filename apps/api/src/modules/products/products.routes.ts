@@ -12,13 +12,14 @@ export const productsRouter = Router();
 productsRouter.get("/", list);
 productsRouter.get("/:id", validateObjectId(), get);
 
-// Admin — JWT + subida de imágenes múltiples opcional
+// Admin — JWT + subida de imágenes múltiples opcional.
+// validate va ANTES de uploadToCloudinary: si el body es inválido no se sube nada a Cloudinary.
 productsRouter.post(
   "/",
   requireAuth,
   parseImageFields,
-  uploadToCloudinary,
   validate(productSchema),
+  uploadToCloudinary,
   create,
 );
 
@@ -27,8 +28,8 @@ productsRouter.put(
   requireAuth,
   validateObjectId(),
   parseImageFields,
-  uploadToCloudinary,
   validate(updateProductSchema),
+  uploadToCloudinary,
   update,
 );
 

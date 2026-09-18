@@ -31,6 +31,13 @@ export async function requireAuth(
       return;
     }
 
+    // 3. Verificar que el admin sigue existiendo (un admin eliminado pierde acceso de inmediato)
+    const adminExists = await AdminModel.exists({ _id: payload.sub });
+    if (!adminExists) {
+      res.status(401).json({ error: "Token inválido o expirado" });
+      return;
+    }
+
     req.adminId = payload.sub as string;
     next();
   } catch {
