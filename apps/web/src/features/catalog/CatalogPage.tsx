@@ -1,14 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import axios from "axios";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  ZoomIn,
-  SlidersHorizontal,
-} from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, X, ZoomIn, SlidersHorizontal } from "lucide-react";
 import { Layout } from "@/shared/components/Layout";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { api } from "@/shared/lib/api";
@@ -93,7 +86,7 @@ function ImageModal({ src, alt, onClose }: ImageModalProps) {
         @keyframes scaleIn { from { transform: scale(0.94); opacity: 0 } to { transform: scale(1); opacity: 1 } }
       `}</style>
     </div>,
-    document.body
+    document.body,
   );
 }
 
@@ -123,9 +116,7 @@ export function CatalogPage() {
           ...(search && { search }),
           ...(category && { category }),
         });
-        const { data } = await api.get<PaginatedProducts>(
-          `/products?${params}`,
-        );
+        const { data } = await api.get<PaginatedProducts>(`/products?${params}`);
         setResult(data);
       } finally {
         setLoading(false);
@@ -139,7 +130,9 @@ export function CatalogPage() {
     api
       .get<Category[]>("/categories", { signal: controller.signal })
       .then(({ data }) => setCategories(data))
-      .catch((err) => { if (!axios.isCancel(err)) setCategories([]); });
+      .catch((err) => {
+        if (!axios.isCancel(err)) setCategories([]);
+      });
     return () => controller.abort();
   }, []);
 
@@ -173,11 +166,7 @@ export function CatalogPage() {
   return (
     <Layout>
       {modalImage && (
-        <ImageModal
-          src={modalImage.src}
-          alt={modalImage.alt}
-          onClose={() => setModalImage(null)}
-        />
+        <ImageModal src={modalImage.src} alt={modalImage.alt} onClose={() => setModalImage(null)} />
       )}
 
       {/* ── Page Header ────────────────────────────────────────────────── */}
@@ -310,9 +299,7 @@ export function CatalogPage() {
                       {/* Zoom overlay */}
                       {p.images[0]?.url && (
                         <button
-                          onClick={() =>
-                            setModalImage({ src: p.images[0].url, alt: p.name })
-                          }
+                          onClick={() => setModalImage({ src: p.images[0].url, alt: p.name })}
                           aria-label={`Ver imagen de ${p.name}`}
                           className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/30"
                         >
@@ -328,9 +315,7 @@ export function CatalogPage() {
                       <p className="text-[11px] font-semibold uppercase tracking-widest text-primary">
                         {p.category?.name}
                       </p>
-                      <h3 className="mt-1.5 font-bold font-display text-base">
-                        {p.name}
-                      </h3>
+                      <h3 className="mt-1.5 font-bold font-display text-base">{p.name}</h3>
                       <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                         {p.description}
                       </p>
@@ -351,22 +336,15 @@ export function CatalogPage() {
                   </button>
 
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter(
-                      (p) =>
-                        p === 1 || p === totalPages || Math.abs(p - page) <= 1,
-                    )
+                    .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
                     .reduce<(number | "...")[]>((acc, p, idx, arr) => {
-                      if (idx > 0 && p - (arr[idx - 1] as number) > 1)
-                        acc.push("...");
+                      if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
                       acc.push(p);
                       return acc;
                     }, [])
                     .map((item, idx) =>
                       item === "..." ? (
-                        <span
-                          key={`ellipsis-${idx}`}
-                          className="px-2 text-muted-foreground"
-                        >
+                        <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">
                           …
                         </span>
                       ) : (

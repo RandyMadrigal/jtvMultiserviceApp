@@ -56,9 +56,7 @@ export function ProductsAdminPage() {
     setLoading(true);
     try {
       const [{ data: paginated }, { data: cats }] = await Promise.all([
-        apiClient.get<PaginatedProducts>(
-          `/products?limit=${PAGE_SIZE}&page=${targetPage}`,
-        ),
+        apiClient.get<PaginatedProducts>(`/products?limit=${PAGE_SIZE}&page=${targetPage}`),
         apiClient.get<Category[]>("/categories"),
       ]);
       setProducts(paginated.items);
@@ -76,8 +74,7 @@ export function ProductsAdminPage() {
   }, [load]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Eliminar este producto? Esta acción no se puede deshacer."))
-      return;
+    if (!confirm("¿Eliminar este producto? Esta acción no se puede deshacer.")) return;
     setDeleting(id);
     try {
       await apiClient.delete(`/products/${id}`);
@@ -109,10 +106,7 @@ export function ProductsAdminPage() {
             <p className="flex items-center gap-1.5 text-xs text-amber-600">
               <Tag className="h-3.5 w-3.5" />
               Crea al menos una{" "}
-              <Link
-                to="/admin/categories"
-                className="font-semibold underline underline-offset-2"
-              >
+              <Link to="/admin/categories" className="font-semibold underline underline-offset-2">
                 categoría
               </Link>{" "}
               primero
@@ -187,7 +181,9 @@ export function ProductsAdminPage() {
                           {p.category?.name && (
                             <span className="text-xs text-muted-foreground">{p.category.name}</span>
                           )}
-                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold sm:hidden ${STATUS_CLASS[p.status]}`}>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold sm:hidden ${STATUS_CLASS[p.status]}`}
+                          >
                             {STATUS_LABEL[p.status]}
                           </span>
                         </div>
@@ -196,14 +192,20 @@ export function ProductsAdminPage() {
                         {p.category?.name}
                       </td>
                       <td className="hidden sm:table-cell px-4 py-3">
-                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_CLASS[p.status]}`}>
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_CLASS[p.status]}`}
+                        >
                           {STATUS_LABEL[p.status]}
                         </span>
                       </td>
                       <td className="hidden lg:table-cell px-4 py-3">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <UserCircle className="h-3.5 w-3.5 shrink-0" />
-                          {p.createdBy?.email ? p.createdBy.email.split("@")[0] : <span className="italic">sistema</span>}
+                          {p.createdBy?.email ? (
+                            p.createdBy.email.split("@")[0]
+                          ) : (
+                            <span className="italic">sistema</span>
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -249,12 +251,9 @@ export function ProductsAdminPage() {
                 </button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter(
-                    (n) => n === 1 || n === totalPages || Math.abs(n - page) <= 1,
-                  )
+                  .filter((n) => n === 1 || n === totalPages || Math.abs(n - page) <= 1)
                   .reduce<(number | "…")[]>((acc, n, idx, arr) => {
-                    if (idx > 0 && n - (arr[idx - 1] as number) > 1)
-                      acc.push("…");
+                    if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push("…");
                     acc.push(n);
                     return acc;
                   }, [])
@@ -268,9 +267,7 @@ export function ProductsAdminPage() {
                         key={n}
                         onClick={() => load(n)}
                         className={`min-w-8 rounded-md px-2 py-1 text-xs font-medium transition ${
-                          n === page
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-secondary"
+                          n === page ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
                         }`}
                       >
                         {n}

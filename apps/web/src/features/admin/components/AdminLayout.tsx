@@ -17,9 +17,9 @@ import { useAuth } from "@/shared/lib/auth.context";
 import { useTheme } from "@/shared/lib/theme.context";
 
 const navItems = [
-  { to: "/admin/products",    icon: Package,  label: "Productos" },
-  { to: "/admin/categories",  icon: Tag,       label: "Categorías" },
-  { to: "/admin/admins",      icon: Users,     label: "Administradores" },
+  { to: "/admin/products", icon: Package, label: "Productos" },
+  { to: "/admin/categories", icon: Tag, label: "Categorías" },
+  { to: "/admin/admins", icon: Users, label: "Administradores" },
 ];
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -30,9 +30,9 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
   }`;
 
 export function AdminLayout() {
-  const { user, logout }  = useAuth();
+  const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
-  const [open, setOpen]   = useState(false);
+  const [open, setOpen] = useState(false);
 
   const SidebarContent = () => (
     <>
@@ -49,12 +49,7 @@ export function AdminLayout() {
       {/* Nav */}
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={linkClass}
-            onClick={() => setOpen(false)}
-          >
+          <NavLink key={item.to} to={item.to} className={linkClass} onClick={() => setOpen(false)}>
             <item.icon className="h-4 w-4" />
             {item.label}
           </NavLink>
@@ -97,7 +92,6 @@ export function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-background">
-
       {/* ── Sidebar desktop (md+) ──────────────────────────────────────── */}
       <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-border bg-card">
         <SidebarContent />

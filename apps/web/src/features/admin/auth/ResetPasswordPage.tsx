@@ -6,17 +6,17 @@ import { extractError } from "@/shared/lib/extractError";
 import { apiBase } from "@/shared/config/env";
 
 export function ResetPasswordPage() {
-  const [searchParams]  = useSearchParams();
-  const navigate        = useNavigate();
-  const token           = searchParams.get("token") ?? "";
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const token = searchParams.get("token") ?? "";
 
-  const [password, setPassword]     = useState("");
-  const [confirm, setConfirm]       = useState("");
-  const [showPass, setShowPass]     = useState(false);
-  const [showConf, setShowConf]     = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [showConf, setShowConf] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError]           = useState("");
-  const [done, setDone]             = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
 
   if (!token) {
     return (

@@ -3,15 +3,7 @@ import { Layout } from "@/shared/components/Layout";
 import { Reveal } from "@/shared/components/Reveal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { QuoteCTA } from "@/shared/components/QuoteCTA";
-import {
-  Printer,
-  Shirt,
-  Package,
-  Megaphone,
-  Palette,
-  Check,
-  ArrowRight,
-} from "lucide-react";
+import { Printer, Shirt, Package, Megaphone, Palette, Check, ArrowRight } from "lucide-react";
 
 const categories = [
   {
@@ -151,7 +143,6 @@ const categories = [
   },
 ];
 
-
 export function ServicesPage() {
   return (
     <Layout>
@@ -174,8 +165,8 @@ export function ServicesPage() {
             Servicios
           </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground animate-in fade-in duration-700 delay-200 fill-mode-both">
-            Desde una tarjeta hasta una valla publicitaria — cualquier idea, la
-            imprimimos con la calidad que mereces.
+            Desde una tarjeta hasta una valla publicitaria — cualquier idea, la imprimimos con la
+            calidad que mereces.
           </p>
         </div>
       </section>
@@ -218,9 +209,7 @@ export function ServicesPage() {
                         <Check className="h-3.5 w-3.5" />
                       </span>
                       <div>
-                        <h3 className="font-bold font-display text-sm">
-                          {s.name}
-                        </h3>
+                        <h3 className="font-bold font-display text-sm">{s.name}</h3>
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                           {s.desc}
                         </p>

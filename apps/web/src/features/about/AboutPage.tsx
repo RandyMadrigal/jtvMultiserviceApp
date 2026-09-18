@@ -1,13 +1,6 @@
 import { Layout } from "@/shared/components/Layout";
 import { Reveal } from "@/shared/components/Reveal";
-import {
-  Award,
-  Users,
-  Clock,
-  Target,
-  CheckCircle,
-  ArrowRight,
-} from "lucide-react";
+import { Award, Users, Clock, Target, CheckCircle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const stats = [
@@ -67,10 +60,9 @@ export function AboutPage() {
             Sobre JTV Multiservice
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground animate-in fade-in duration-700 delay-200 fill-mode-both">
-            JTV MULTI-SERVICE es una empresa dedicada a brindar servicios de
-            impresión y soluciones gráficas, con un compromiso firme en la
-            calidad, puntualidad y atención personalizada. Nuestro objetivo es
-            ofrecer productos impresos y promocionales de alto impacto.
+            JTV MULTI-SERVICE es una empresa dedicada a brindar servicios de impresión y soluciones
+            gráficas, con un compromiso firme en la calidad, puntualidad y atención personalizada.
+            Nuestro objetivo es ofrecer productos impresos y promocionales de alto impacto.
           </p>
         </div>
       </section>
@@ -83,8 +75,7 @@ export function AboutPage() {
               <div
                 className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 style={{
-                  background:
-                    "linear-gradient(135deg, rgba(0,153,217,0.04) 0%, transparent 100%)",
+                  background: "linear-gradient(135deg, rgba(0,153,217,0.04) 0%, transparent 100%)",
                 }}
                 aria-hidden="true"
               />
@@ -94,11 +85,10 @@ export function AboutPage() {
                 </div>
                 <h2 className="text-2xl font-bold md:text-3xl">Nuestra misión</h2>
                 <p className="mt-4 leading-relaxed text-muted-foreground">
-                  Ofrecer servicios de impresión y soluciones gráficas de alto
-                  impacto que ayuden a nuestros clientes a comunicar su marca,
-                  alcanzar sus objetivos y destacarse en el mercado, con calidad
-                  garantizada, entregas puntuales y atención personalizada en cada
-                  proyecto.
+                  Ofrecer servicios de impresión y soluciones gráficas de alto impacto que ayuden a
+                  nuestros clientes a comunicar su marca, alcanzar sus objetivos y destacarse en el
+                  mercado, con calidad garantizada, entregas puntuales y atención personalizada en
+                  cada proyecto.
                 </p>
               </div>
             </div>
@@ -109,8 +99,7 @@ export function AboutPage() {
               <div
                 className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 style={{
-                  background:
-                    "linear-gradient(135deg, rgba(193,0,126,0.04) 0%, transparent 100%)",
+                  background: "linear-gradient(135deg, rgba(193,0,126,0.04) 0%, transparent 100%)",
                 }}
                 aria-hidden="true"
               />
@@ -120,11 +109,10 @@ export function AboutPage() {
                 </div>
                 <h2 className="text-2xl font-bold md:text-3xl">Nuestra visión</h2>
                 <p className="mt-4 leading-relaxed text-muted-foreground">
-                  Ser la empresa de referencia en impresión y diseño gráfico en
-                  Santo Domingo, reconocida por la excelencia en cada pieza que
-                  producimos, la fidelidad de nuestros clientes y nuestra
-                  capacidad de adaptarnos a las necesidades gráficas de cualquier
-                  sector.
+                  Ser la empresa de referencia en impresión y diseño gráfico en Santo Domingo,
+                  reconocida por la excelencia en cada pieza que producimos, la fidelidad de
+                  nuestros clientes y nuestra capacidad de adaptarnos a las necesidades gráficas de
+                  cualquier sector.
                 </p>
               </div>
             </div>
@@ -148,9 +136,7 @@ export function AboutPage() {
             <span className="text-xs font-semibold uppercase tracking-widest text-primary">
               En números
             </span>
-            <h2 className="mt-2 text-2xl font-bold md:text-3xl">
-              Resultados que nos respaldan
-            </h2>
+            <h2 className="mt-2 text-2xl font-bold md:text-3xl">Resultados que nos respaldan</h2>
           </Reveal>
 
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -165,9 +151,7 @@ export function AboutPage() {
                   <p className="text-4xl font-extrabold font-display text-gradient-brand">
                     {s.value}
                   </p>
-                  <p className="mt-1.5 text-sm text-muted-foreground">
-                    {s.label}
-                  </p>
+                  <p className="mt-1.5 text-sm text-muted-foreground">{s.label}</p>
                 </div>
               </Reveal>
             ))}
@@ -183,12 +167,10 @@ export function AboutPage() {
               <span className="text-xs font-semibold uppercase tracking-widest text-primary">
                 Lo que nos define
               </span>
-              <h2 className="mt-2 text-2xl font-bold md:text-3xl">
-                Valores que nos caracterizan
-              </h2>
+              <h2 className="mt-2 text-2xl font-bold md:text-3xl">Valores que nos caracterizan</h2>
               <p className="mt-3 leading-relaxed text-muted-foreground">
-                Cada proyecto que tomamos es una oportunidad para demostrar
-                nuestro compromiso con la excelencia.
+                Cada proyecto que tomamos es una oportunidad para demostrar nuestro compromiso con
+                la excelencia.
               </p>
               <ul className="mt-7 space-y-3">
                 {values.map((v) => (
@@ -227,9 +209,7 @@ export function AboutPage() {
                   <h2 className="mt-2 text-2xl font-bold text-white md:text-3xl">
                     ¿Listo para empezar tu proyecto?
                   </h2>
-                  <p className="mt-1.5 text-white/65">
-                    Cotiza gratis y sin compromiso.
-                  </p>
+                  <p className="mt-1.5 text-white/65">Cotiza gratis y sin compromiso.</p>
                 </div>
                 <Link
                   to="/contacto"

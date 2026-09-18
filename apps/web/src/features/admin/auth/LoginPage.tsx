@@ -11,14 +11,14 @@ type Step = "credentials" | "otp";
 export function LoginPage() {
   const { login, verifyOtp, isAuthenticated, isLoading } = useAuth();
 
-  const [step, setStep]         = useState<Step>("credentials");
-  const [email, setEmail]       = useState("");
+  const [step, setStep] = useState<Step>("credentials");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp]           = useState("");
-  const [error, setError]       = useState("");
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [resending, setResending]   = useState(false);
-  const [resendMsg, setResendMsg]   = useState("");
+  const [resending, setResending] = useState(false);
+  const [resendMsg, setResendMsg] = useState("");
 
   if (isLoading) return null;
   if (isAuthenticated) return <Navigate to="/admin/products" replace />;
@@ -84,9 +84,7 @@ export function LoginPage() {
         {step === "credentials" ? (
           <>
             <h1 className="mb-1 text-xl font-bold">Iniciar sesión</h1>
-            <p className="mb-6 text-sm text-muted-foreground">
-              Accede al panel de administración
-            </p>
+            <p className="mb-6 text-sm text-muted-foreground">Accede al panel de administración</p>
 
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
@@ -196,7 +194,11 @@ export function LoginPage() {
 
             <div className="mt-4 flex items-center justify-between text-sm">
               <button
-                onClick={() => { setStep("credentials"); setError(""); setOtp(""); }}
+                onClick={() => {
+                  setStep("credentials");
+                  setError("");
+                  setOtp("");
+                }}
                 className="text-muted-foreground hover:text-foreground transition"
               >
                 ← Volver

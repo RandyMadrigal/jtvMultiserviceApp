@@ -78,9 +78,7 @@ function NotFoundPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">
-          Página no encontrada
-        </h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Página no encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           La página que buscas no existe o fue movida.
         </p>
@@ -114,9 +112,9 @@ export default function App() {
               <Route path="/contacto" element={<ContactPage />} />
 
               {/* ── Panel de administración ─────────────────────────── */}
-              <Route path="/admin/login"           element={<LoginPage />} />
+              <Route path="/admin/login" element={<LoginPage />} />
               <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/admin/reset-password"  element={<ResetPasswordPage />} />
+              <Route path="/admin/reset-password" element={<ResetPasswordPage />} />
               <Route
                 path="/admin"
                 element={
@@ -125,10 +123,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
-                <Route
-                  index
-                  element={<Navigate to="/admin/products" replace />}
-                />
+                <Route index element={<Navigate to="/admin/products" replace />} />
                 <Route path="products" element={<ProductsAdminPage />} />
                 <Route path="categories" element={<CategoriesAdminPage />} />
                 <Route path="admins" element={<AdminsPage />} />

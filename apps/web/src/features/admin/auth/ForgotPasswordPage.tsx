@@ -6,10 +6,10 @@ import { extractError } from "@/shared/lib/extractError";
 import { apiBase } from "@/shared/config/env";
 
 export function ForgotPasswordPage() {
-  const [email, setEmail]         = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [sent, setSent]           = useState(false);
-  const [error, setError]         = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,9 +45,8 @@ export function ForgotPasswordPage() {
             </div>
             <h1 className="mb-2 text-xl font-bold">Revisa tu correo</h1>
             <p className="mb-6 text-sm text-muted-foreground">
-              Si <span className="font-medium text-foreground">{email}</span> está
-              registrado, recibirás un enlace para restablecer tu contraseña en los
-              próximos minutos.
+              Si <span className="font-medium text-foreground">{email}</span> está registrado,
+              recibirás un enlace para restablecer tu contraseña en los próximos minutos.
             </p>
             <p className="text-xs text-muted-foreground">
               ¿No llegó el correo? Revisa la carpeta de spam o{" "}

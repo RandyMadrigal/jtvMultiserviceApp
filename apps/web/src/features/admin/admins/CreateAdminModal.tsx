@@ -9,9 +9,9 @@ interface Props {
 }
 
 function validatePassword(pw: string): string {
-  if (pw.length < 8)          return "Mínimo 8 caracteres";
-  if (!/[A-Z]/.test(pw))      return "Debe contener al menos una letra mayúscula";
-  if (!/[0-9]/.test(pw))      return "Debe contener al menos un número";
+  if (pw.length < 8) return "Mínimo 8 caracteres";
+  if (!/[A-Z]/.test(pw)) return "Debe contener al menos una letra mayúscula";
+  if (!/[0-9]/.test(pw)) return "Debe contener al menos un número";
   if (!/[^A-Za-z0-9]/.test(pw)) return "Debe contener al menos un carácter especial";
   return "";
 }
@@ -27,7 +27,10 @@ export function CreateAdminModal({ onSuccess, onClose }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const pwValidation = validatePassword(password);
-    if (pwValidation) { setPwError(pwValidation); return; }
+    if (pwValidation) {
+      setPwError(pwValidation);
+      return;
+    }
     setPwError("");
     setError("");
     setSubmitting(true);
@@ -47,7 +50,12 @@ export function CreateAdminModal({ onSuccess, onClose }: Props) {
         <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-card">
           <div className="flex items-center justify-between border-b border-border px-6 py-4">
             <h2 className="font-semibold">Administrador creado</h2>
-            <button onClick={() => { onSuccess(); }} className="rounded-md p-1 hover:bg-secondary">
+            <button
+              onClick={() => {
+                onSuccess();
+              }}
+              className="rounded-md p-1 hover:bg-secondary"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -60,8 +68,8 @@ export function CreateAdminModal({ onSuccess, onClose }: Props) {
                 <h3 className="mb-2 font-semibold text-lg">¡Cuenta creada!</h3>
                 <p className="text-sm text-muted-foreground">
                   Se envió un código de verificación a{" "}
-                  <span className="font-medium text-foreground">{email}</span>.
-                  El administrador debe ingresar ese código la primera vez que inicie sesión.
+                  <span className="font-medium text-foreground">{email}</span>. El administrador
+                  debe ingresar ese código la primera vez que inicie sesión.
                 </p>
               </>
             ) : (
@@ -72,8 +80,9 @@ export function CreateAdminModal({ onSuccess, onClose }: Props) {
                 <h3 className="mb-2 font-semibold text-lg">Cuenta creada</h3>
                 <p className="text-sm text-muted-foreground">
                   La cuenta fue creada pero no se pudo enviar el código al correo{" "}
-                  <span className="font-medium text-foreground">{email}</span>.
-                  Usa el botón <strong>Reenviar OTP</strong> desde la lista de administradores para volver a intentarlo.
+                  <span className="font-medium text-foreground">{email}</span>. Usa el botón{" "}
+                  <strong>Reenviar OTP</strong> desde la lista de administradores para volver a
+                  intentarlo.
                 </p>
               </>
             )}
@@ -117,23 +126,27 @@ export function CreateAdminModal({ onSuccess, onClose }: Props) {
           <div>
             <label className="mb-1 block text-sm font-medium" htmlFor="password">
               Contraseña *{" "}
-              <span className="text-xs text-muted-foreground">(mín. 8 caracteres, mayúscula, número y símbolo)</span>
+              <span className="text-xs text-muted-foreground">
+                (mín. 8 caracteres, mayúscula, número y símbolo)
+              </span>
             </label>
             <input
               id="password"
               type="password"
               required
               value={password}
-              onChange={(e) => { setPassword(e.target.value); setPwError(""); }}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPwError("");
+              }}
               className={`w-full rounded-md border bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring/50 ${pwError ? "border-destructive" : "border-input"}`}
             />
-            {pwError && (
-              <p className="mt-1 text-xs text-destructive">{pwError}</p>
-            )}
+            {pwError && <p className="mt-1 text-xs text-destructive">{pwError}</p>}
           </div>
 
           <p className="rounded-md bg-secondary/60 px-3 py-2 text-xs text-muted-foreground">
-            Se enviará un código de verificación al correo del nuevo administrador. Deberá usarlo la primera vez que inicie sesión.
+            Se enviará un código de verificación al correo del nuevo administrador. Deberá usarlo la
+            primera vez que inicie sesión.
           </p>
 
           {error && (

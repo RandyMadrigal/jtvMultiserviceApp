@@ -184,7 +184,9 @@ export function AdminsPage() {
                               title="Reenviar código OTP"
                               className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-amber-600 transition hover:bg-amber-50 disabled:opacity-50"
                             >
-                              <RefreshCw className={`h-3.5 w-3.5 ${resendingId === a._id ? "animate-spin" : ""}`} />
+                              <RefreshCw
+                                className={`h-3.5 w-3.5 ${resendingId === a._id ? "animate-spin" : ""}`}
+                              />
                               <span className="hidden sm:inline">Reenviar OTP</span>
                             </button>
                           )}
@@ -224,9 +226,7 @@ export function AdminsPage() {
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter(
-                    (n) => n === 1 || n === totalPages || Math.abs(n - page) <= 1,
-                  )
+                  .filter((n) => n === 1 || n === totalPages || Math.abs(n - page) <= 1)
                   .reduce<(number | "…")[]>((acc, n, idx, arr) => {
                     if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push("…");
                     acc.push(n);
@@ -234,7 +234,9 @@ export function AdminsPage() {
                   }, [])
                   .map((n, i) =>
                     n === "…" ? (
-                      <span key={`e-${i}`} className="px-1">…</span>
+                      <span key={`e-${i}`} className="px-1">
+                        …
+                      </span>
                     ) : (
                       <button
                         key={n}
@@ -277,8 +279,8 @@ export function AdminsPage() {
             <h2 className="mb-1 text-lg font-semibold">Eliminar administrador</h2>
             <p className="mb-5 text-sm text-muted-foreground">
               ¿Estás seguro de que quieres eliminar a{" "}
-              <span className="font-medium text-foreground">{adminToDelete?.email}</span>?
-              Esta acción no se puede deshacer.
+              <span className="font-medium text-foreground">{adminToDelete?.email}</span>? Esta
+              acción no se puede deshacer.
             </p>
             {deleteError && (
               <p className="mb-4 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">

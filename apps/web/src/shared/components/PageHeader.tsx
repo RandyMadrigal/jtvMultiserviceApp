@@ -7,7 +7,9 @@ interface PageHeaderProps {
 
 export function PageHeader({ eyebrow, title, subtitle, className }: PageHeaderProps) {
   return (
-    <section className={`relative overflow-hidden border-b border-border bg-secondary/50 py-16 ${className ?? ""}`}>
+    <section
+      className={`relative overflow-hidden border-b border-border bg-secondary/50 py-16 ${className ?? ""}`}
+    >
       <div
         className="pointer-events-none absolute inset-0 opacity-25"
         style={{

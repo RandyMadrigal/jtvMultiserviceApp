@@ -53,11 +53,7 @@ apiClient.interceptors.response.use(
 
     if (!refreshPromise) {
       refreshPromise = axios
-        .post<{ accessToken: string }>(
-          `${apiBase}/auth/refresh`,
-          {},
-          { withCredentials: true },
-        )
+        .post<{ accessToken: string }>(`${apiBase}/auth/refresh`, {}, { withCredentials: true })
         .then(({ data }) => {
           setToken(data.accessToken);
           return data.accessToken;

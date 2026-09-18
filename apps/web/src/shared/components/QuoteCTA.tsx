@@ -15,7 +15,9 @@ export function QuoteCTA({
   className,
 }: QuoteCTAProps) {
   return (
-    <div className={`relative overflow-hidden rounded-3xl bg-gradient-hero p-10 shadow-elegant md:p-14 ${className ?? ""}`}>
+    <div
+      className={`relative overflow-hidden rounded-3xl bg-gradient-hero p-10 shadow-elegant md:p-14 ${className ?? ""}`}
+    >
       <div
         className="pointer-events-none absolute inset-0"
         style={{

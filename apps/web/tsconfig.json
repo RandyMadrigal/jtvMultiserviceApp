@@ -22,7 +22,7 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@jtv/shared":   ["../../packages/shared/src/index.ts"],
+      "@jtv/shared": ["../../packages/shared/src/index.ts"],
       "@jtv/shared/*": ["../../packages/shared/src/*"]
     }
   }
