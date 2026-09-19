@@ -72,7 +72,8 @@ export async function verifyOtp(dto: VerifyOtpDto): Promise<{ accessToken: strin
   // no pueden exceder MAX_OTP_ATTEMPTS. El límite es por código (por email),
   // independiente de la IP, así que rotar IPs no permite adivinar el OTP.
   const otp = await OtpModel.findOneAndUpdate(
-    { email, expiresAt: { $gt: new Date() }, attempts: { $lt: MAX_OTP_ATTEMPTS } },
+    // $not/$gte (y no $lt): también coincide con OTPs creados antes de existir el campo `attempts`
+    { email, expiresAt: { $gt: new Date() }, attempts: { $not: { $gte: MAX_OTP_ATTEMPTS } } },
     { $inc: { attempts: 1 } },
     { new: true },
   );
