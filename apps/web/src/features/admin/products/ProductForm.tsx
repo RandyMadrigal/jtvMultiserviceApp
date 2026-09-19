@@ -1,131 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Upload, Loader2, CheckCircle2, AlertCircle, Plus, Star } from "lucide-react";
+import { X, Upload, Loader2, Plus } from "lucide-react";
 import { apiClient } from "@/shared/lib/api-client";
+import { ProductCardItem } from "./ProductCardItem";
+import {
+  compressImage,
+  makeCard,
+  type Category,
+  type Product,
+  type ProductCard,
+} from "./product-form.helpers";
 
-/* ── Tipos ─────────────────────────────────────────────────────────────────── */
-type Status = "disponible" | "agotado" | "promocion";
-type CardState = "idle" | "uploading" | "done" | "error";
-
-interface Category {
-  _id: string;
-  name: string;
-}
-interface ImageItem {
-  url: string;
-  public_id: string;
-}
-
-export interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  category: Category;
-  images: ImageItem[];
-  status: Status;
-  createdBy?: { _id: string; email: string } | null;
-  createdAt?: string;
-}
-
-interface ProductCard {
-  tempId: string;
-  file: File | null; // null = imagen existente sin cambios (modo edición)
-  preview: string;
-  name: string;
-  description: string;
-  categoryId: string;
-  status: Status;
-  state: CardState;
-  progress: number;
-  errorMsg: string;
-}
+export type { Product } from "./product-form.helpers";
 
 interface Props {
   product?: Product;
   categories?: Category[];
   onSuccess: () => void;
   onClose: () => void;
-}
-
-/* ── Helpers ───────────────────────────────────────────────────────────────── */
-async function compressImage(file: File, maxPx = 1280, q = 0.85): Promise<File> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const scale = Math.min(maxPx / Math.max(img.width, img.height), 1);
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const outType = file.type === "image/png" ? "image/png" : "image/webp";
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error("Compression failed"));
-            return;
-          }
-          resolve(blob.size < file.size ? new File([blob], file.name, { type: outType }) : file);
-        },
-        outType,
-        q,
-      );
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Image load failed"));
-    };
-    img.src = url;
-  });
-}
-
-function makeCard(
-  override: Partial<ProductCard> & { preview: string; categoryId: string },
-): ProductCard {
-  return {
-    tempId: crypto.randomUUID(),
-    file: null,
-    name: "",
-    description: "",
-    status: "disponible",
-    state: "idle",
-    progress: 0,
-    errorMsg: "",
-    ...override,
-  };
-}
-
-/* ── Indicador de estado por tarjeta ───────────────────────────────────────── */
-function CardStatus({ card }: { card: ProductCard }) {
-  if (card.state === "idle") return null;
-
-  if (card.state === "uploading")
-    return (
-      <div className="mt-3 space-y-1">
-        <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
-          <div
-            className="h-full rounded-full bg-primary transition-all duration-150"
-            style={{ width: `${card.progress}%` }}
-          />
-        </div>
-        <p className="text-xs text-muted-foreground">
-          {card.progress < 100 ? `Subiendo… ${card.progress}%` : "Procesando en servidor…"}
-        </p>
-      </div>
-    );
-
-  if (card.state === "done")
-    return (
-      <div className="mt-2 flex items-center gap-1.5 text-xs text-green-600">
-        <CheckCircle2 className="h-3.5 w-3.5" /> Producto creado
-      </div>
-    );
-
-  return (
-    <div className="mt-2 flex items-center gap-1.5 text-xs text-destructive">
-      <AlertCircle className="h-3.5 w-3.5" /> {card.errorMsg || "Error al subir"}
-    </div>
-  );
 }
 
 /* ── Componente principal ──────────────────────────────────────────────────── */
@@ -171,6 +62,8 @@ export function ProductForm({ product, categories: categoriesProp, onSuccess, on
       setCategories(data);
       initCards(data);
     });
+    // Inicialización única a propósito: si `product` o `categoriesProp` cambiaran y el efecto se
+    // volviera a ejecutar, se reiniciarían las tarjetas y se perdería lo que el usuario ya editó.
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Liberar object URLs al desmontar ────────────────────────────────── */
@@ -379,163 +272,18 @@ export function ProductForm({ product, categories: categoriesProp, onSuccess, on
 
             {/* ── Tarjetas ── */}
             {cards.map((card, idx) => (
-              <div
+              <ProductCardItem
                 key={card.tempId}
-                className={`rounded-xl border bg-background p-4 transition-colors ${
-                  card.state === "done"
-                    ? "border-green-300 bg-green-50/30"
-                    : card.state === "error"
-                      ? "border-destructive/40 bg-destructive/5"
-                      : card.state === "uploading"
-                        ? "border-primary/40 bg-primary/5"
-                        : "border-border"
-                }`}
-              >
-                <div className="flex flex-col gap-4 sm:flex-row">
-                  {/* ── Imagen ── */}
-                  <div className="relative shrink-0">
-                    <div className="relative h-24 w-24 overflow-hidden rounded-lg bg-secondary">
-                      {card.preview ? (
-                        <img src={card.preview} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <Upload className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                      )}
-
-                      {/* Overlay de estado sobre la imagen */}
-                      {card.state === "uploading" && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                          <Loader2 className="h-6 w-6 animate-spin text-white" />
-                        </div>
-                      )}
-                      {card.state === "done" && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-green-500/40">
-                          <CheckCircle2 className="h-7 w-7 text-white" />
-                        </div>
-                      )}
-
-                      {/* Badge Principal */}
-                      {idx === 0 && (
-                        <span className="absolute left-1 top-1 flex items-center gap-0.5 rounded bg-primary px-1 py-0.5 text-[9px] font-semibold text-primary-foreground">
-                          <Star className="h-2 w-2" /> Principal
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Botón cambiar imagen (modo edición) */}
-                    {isEdit && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => editFileRef.current?.click()}
-                          disabled={submitting}
-                          className="mt-1 w-full rounded text-center text-[10px] text-muted-foreground underline hover:text-foreground disabled:opacity-40"
-                        >
-                          Cambiar
-                        </button>
-                        <input
-                          ref={editFileRef}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleReplaceImage}
-                        />
-                      </>
-                    )}
-                  </div>
-
-                  {/* ── Campos del producto ── */}
-                  <div className="flex flex-1 flex-col gap-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-xs font-semibold text-muted-foreground">
-                        Producto #{idx + 1}
-                      </span>
-                      {!isEdit && card.state !== "done" && (
-                        <button
-                          type="button"
-                          onClick={() => removeCard(card.tempId)}
-                          disabled={submitting}
-                          className="rounded p-0.5 text-muted-foreground hover:text-destructive disabled:opacity-40"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Nombre */}
-                    <input
-                      required
-                      maxLength={120}
-                      placeholder="Nombre del producto *"
-                      value={card.name}
-                      disabled={submitting || card.state === "done"}
-                      onChange={(e) => updateCard(card.tempId, { name: e.target.value })}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 disabled:opacity-60"
-                    />
-
-                    {/* Descripción */}
-                    <textarea
-                      maxLength={500}
-                      rows={2}
-                      placeholder="Descripción (opcional)"
-                      value={card.description}
-                      disabled={submitting || card.state === "done"}
-                      onChange={(e) => updateCard(card.tempId, { description: e.target.value })}
-                      className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/50 disabled:opacity-60"
-                    />
-
-                    {/* Categoría + Estado */}
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <div>
-                        <label className="mb-0.5 block text-xs font-medium text-muted-foreground">
-                          Categoría *
-                        </label>
-                        <select
-                          required
-                          value={card.categoryId}
-                          disabled={submitting || card.state === "done" || categories.length === 0}
-                          onChange={(e) =>
-                            updateCard(card.tempId, {
-                              categoryId: e.target.value,
-                            })
-                          }
-                          className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring/50 disabled:opacity-60"
-                        >
-                          {categories.length === 0 && <option value="">Sin categorías</option>}
-                          {categories.map((c) => (
-                            <option key={c._id} value={c._id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="mb-0.5 block text-xs font-medium text-muted-foreground">
-                          Estado *
-                        </label>
-                        <select
-                          value={card.status}
-                          disabled={submitting || card.state === "done"}
-                          onChange={(e) =>
-                            updateCard(card.tempId, {
-                              status: e.target.value as Status,
-                            })
-                          }
-                          className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring/50 disabled:opacity-60"
-                        >
-                          <option value="disponible">Disponible</option>
-                          <option value="agotado">Agotado</option>
-                          <option value="promocion">Promoción</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Estado de carga por tarjeta */}
-                    <CardStatus card={card} />
-                  </div>
-                </div>
-              </div>
+                card={card}
+                index={idx}
+                isEdit={isEdit}
+                submitting={submitting}
+                categories={categories}
+                editFileRef={editFileRef}
+                onChange={(patch) => updateCard(card.tempId, patch)}
+                onRemove={() => removeCard(card.tempId)}
+                onReplaceImage={handleReplaceImage}
+              />
             ))}
           </div>
 

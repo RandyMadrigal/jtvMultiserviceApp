@@ -32,7 +32,7 @@ export class MongoRateLimitStore implements Store {
     this._prefix = prefix;
   }
 
-  // Clave con prefijo: "login:192.168.1.1", "pwd-reset:192.168.1.1", etc.
+  // Clave con prefijo: "login:192.168.1.1", "forgot-pwd:192.168.1.1", "otp:192.168.1.1", etc.
   private pk(key: string): string {
     return `${this._prefix}:${key}`;
   }
