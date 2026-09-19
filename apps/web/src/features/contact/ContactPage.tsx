@@ -32,7 +32,7 @@ const contacts = [
   {
     icon: Clock,
     label: "Horario de atención",
-    value: "Lunes – Sábado · 8:00 a.m. – 5:00 p.m.",
+    value: `Lunes – Viernes: 09:00 a.m – 6:00 p.m. \n Sábados: 09:00 a.m. – 1:00 p.m.`,
     href: undefined,
     color: "from-[#7D0052] to-[#C1007E]",
   },
@@ -77,7 +77,9 @@ export function ContactPage() {
                     <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
                       {c.label}
                     </p>
-                    <p className="mt-0.5 font-medium leading-relaxed">{c.value}</p>
+                    <p className="mt-0.5 font-medium leading-relaxed whitespace-pre-line">
+                      {c.value}
+                    </p>
                   </div>
                 </div>
               );

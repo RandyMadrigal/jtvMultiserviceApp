@@ -7,7 +7,7 @@ import { Seo } from "@/shared/components/Seo";
 const stats = [
   {
     icon: Users,
-    value: "500+",
+    value: "100+",
     label: "Clientes satisfechos",
     color: "from-[#0099D9] to-[#0077B6]",
   },
@@ -63,7 +63,7 @@ export function AboutPage() {
             Quiénes somos
           </span>
           <h1 className="mt-2 text-4xl font-bold md:text-5xl animate-in fade-in slide-in-from-bottom-5 duration-700 delay-100 fill-mode-both">
-            Sobre JTV Multiservice
+            JTV MULTISERVICE
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground animate-in fade-in duration-700 delay-200 fill-mode-both">
             JTV MULTI-SERVICE es una empresa dedicada a brindar servicios de impresión y soluciones

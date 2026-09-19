@@ -4,7 +4,7 @@ export const services = [
   {
     icon: Printer,
     label: "Impresión General",
-    desc: "Tarjetas, volantes, brochures, afiches, carpetas corporativas, sobres y talonarios.",
+    desc: "Tarjetas, volantes, brochures, afiches, carpetas corporativas, sobres, talonarios y más.",
     color: "from-[#0099D9] to-[#0077B6]",
   },
   {

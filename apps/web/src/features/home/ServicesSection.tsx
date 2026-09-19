@@ -12,9 +12,6 @@ export function ServicesSection() {
       <div ref={servicesRef} className="mx-auto max-w-7xl px-4 md:px-6">
         {/* Section header */}
         <div className={`mx-auto max-w-2xl text-center ${fadeUp(servicesInView)}`}>
-          <span className="text-xs font-semibold uppercase tracking-widest text-primary">
-            Lo que hacemos
-          </span>
           <h2 className="mt-3 text-3xl font-bold text-balance md:text-4xl">
             Servicios que
             <span className="text-gradient-brand"> transforman</span> tu marca

@@ -33,18 +33,13 @@ export function HeroSection() {
             Imprenta · Diseño · Producción
           </span>
 
-          <h1 className="mt-6 text-balance text-5xl font-extrabold leading-[1.02] tracking-tight md:text-6xl lg:text-7xl animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 fill-mode-both">
-            Damos vida a <br className="hidden md:block" />
-            tus ideas{" "}
-            <span className="text-gradient-brand">
-              en tinta
-              <br className="hidden md:block" /> y color.
-            </span>
+          <h1 className="mt-6 text-balance text-5xl font-extrabold leading-[1.02] tracking-tight md:text-5xl lg:text-6xl animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 fill-mode-both">
+            TU SOLUCIÓN <br className="hidden md:block" />
+            <span className="text-gradient-brand">GRÁFICA.</span>
           </h1>
 
           <p className="mt-6 max-w-lg text-base leading-relaxed text-white/65 md:text-lg animate-in fade-in duration-700 delay-300 fill-mode-both">
             En JTV Multiservice transformamos tus diseños en productos impresos de alta calidad.
-            Desde una tarjeta de presentación hasta un banner gigante.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-500 delay-500 fill-mode-both">
