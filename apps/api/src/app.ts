@@ -25,7 +25,8 @@ app.set("trust proxy", 1);
 app.use(requestIdMiddleware);
 
 // ── Health check ─────────────────────────────────────────────────────────────
-//Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
+// Público a propósito: el healthcheck de Railway lo llama sin cabeceras. Solo expone
+// el estado de la conexión a la base de datos, nada sensible.
 app.get("/health", async (_req, res) => {
   const dbHealthy = mongoose.connection.readyState === 1;
   res.status(dbHealthy ? 200 : 503).json({

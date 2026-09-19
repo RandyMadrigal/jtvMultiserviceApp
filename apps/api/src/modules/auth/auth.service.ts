@@ -10,7 +10,7 @@ import { sendPasswordResetEmail, sendOtpEmail } from "@/shared/utils/email";
 import { env } from "@/shared/config/env";
 import { AppError } from "@/shared/errors/AppError";
 import { logger } from "@/shared/utils/logger";
-import { hashOtp } from "@/shared/utils/crypto";
+import { hashOtp, hashToken } from "@/shared/utils/crypto";
 import type { LoginDto, VerifyOtpDto } from "./auth.types";
 
 export const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
@@ -35,7 +35,7 @@ function generateAccessToken(adminId: string): string {
 async function createRefreshToken(adminId: string): Promise<string> {
   const token = crypto.randomBytes(64).toString("hex");
   await RefreshToken.create({
-    token,
+    token: hashToken(token), // en la DB solo vive el hash; el token en claro va únicamente en la cookie
     adminId,
     expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
   });
@@ -111,7 +111,7 @@ export async function refreshAccessToken(
   oldToken: string,
 ): Promise<{ accessToken: string; newRefreshToken: string }> {
   // Elimina el token viejo atómicamente — si ya fue usado es un replay attack
-  const stored = await RefreshToken.findOneAndDelete({ token: oldToken });
+  const stored = await RefreshToken.findOneAndDelete({ token: hashToken(oldToken) });
 
   if (!stored) {
     throw new AppError(401, "Refresh token inválido o expirado");
@@ -134,7 +134,7 @@ export async function refreshAccessToken(
 }
 
 export async function revokeRefreshToken(token: string): Promise<void> {
-  await RefreshToken.deleteOne({ token });
+  await RefreshToken.deleteOne({ token: hashToken(token) });
 }
 
 export async function revokeAllAdminTokens(adminId: string): Promise<void> {
@@ -198,9 +198,13 @@ export async function resetPassword(rawToken: string, newPassword: string): Prom
   }
 
   const hash = await bcrypt.hash(newPassword, 12);
-  await AdminModel.updateOne({ _id: record.adminId }, { $set: { password: hash, verified: true } });
+  await AdminModel.updateOne(
+    { _id: record.adminId },
+    { $set: { password: hash, verified: true, passwordChangedAt: new Date() } },
+  );
 
-  // Invalida todas las sesiones activas tras el cambio de contraseña
+  // Invalida todas las sesiones activas tras el cambio de contraseña:
+  // los refresh tokens se borran y requireAuth rechaza los access tokens anteriores a passwordChangedAt
   await RefreshToken.deleteMany({ adminId: record.adminId });
 
   logger.info({

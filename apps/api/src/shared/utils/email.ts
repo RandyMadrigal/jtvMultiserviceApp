@@ -3,6 +3,16 @@ import { env } from "@/shared/config/env";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
+// Escapa los valores que se interpolan en el HTML de los correos
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
   await resend.emails.send({
     from: env.RESEND_FROM,
@@ -18,7 +28,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string): Prom
         <p style="color:#374151;margin:0 0 20px">
           Haz clic en el botón para crear una nueva contraseña. El enlace expira en <strong>1 hora</strong>.
         </p>
-        <a href="${resetUrl}"
+        <a href="${escapeHtml(resetUrl)}"
            style="display:inline-block;background:#2563eb;color:#fff;font-weight:600;
                   padding:12px 24px;border-radius:8px;text-decoration:none;margin:0 0 20px">
           Restablecer contraseña
@@ -27,7 +37,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string): Prom
           Si el botón no funciona, copia y pega este enlace en tu navegador:
         </p>
         <p style="color:#2563eb;font-size:0.8rem;word-break:break-all;margin:0 0 20px">
-          ${resetUrl}
+          ${escapeHtml(resetUrl)}
         </p>
         <p style="color:#6b7280;font-size:0.875rem;margin:0">
           Si no solicitaste este cambio, ignora este mensaje. Tu contraseña no cambiará.
@@ -55,13 +65,13 @@ export async function sendOtpEmail(to: string, code: string): Promise<void> {
         </p>
         <div style="font-size:2rem;font-weight:700;letter-spacing:0.4em;text-align:center;
                     padding:20px;background:#f4f4f5;border-radius:10px;margin:0 0 20px">
-          ${code}
+          ${escapeHtml(code)}
         </div>
         <p style="color:#374151;margin:0 0 8px">
           Ingresa con tu correo y contraseña en la página de acceso — el sistema te pedirá
           este código para verificar tu cuenta:
         </p>
-        <a href="${loginUrl}"
+        <a href="${escapeHtml(loginUrl)}"
            style="display:inline-block;background:#2563eb;color:#fff;font-weight:600;
                   padding:12px 24px;border-radius:8px;text-decoration:none;margin:0 0 20px">
           Ir a la página de acceso
@@ -70,7 +80,7 @@ export async function sendOtpEmail(to: string, code: string): Promise<void> {
           Si el botón no funciona, copia y pega este enlace en tu navegador:
         </p>
         <p style="color:#2563eb;font-size:0.8rem;word-break:break-all;margin:0 0 20px">
-          ${loginUrl}
+          ${escapeHtml(loginUrl)}
         </p>
         <p style="color:#6b7280;font-size:0.875rem;margin:0">
           Este código expira en <strong>15 minutos</strong>.
