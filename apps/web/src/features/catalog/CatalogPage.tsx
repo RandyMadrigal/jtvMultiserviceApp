@@ -10,6 +10,7 @@ import { ImageModal } from "./ImageModal";
 import { CatalogFilters } from "./CatalogFilters";
 import { ProductCard } from "./ProductCard";
 import { CatalogPagination } from "./CatalogPagination";
+import { Seo } from "@/shared/components/Seo";
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export function CatalogPage() {
@@ -86,6 +87,11 @@ export function CatalogPage() {
 
   return (
     <Layout>
+      <Seo
+        title="Catálogo de productos impresos"
+        description="Explora el catálogo de JTV Multiservice: tarjetas, stickers, banners, sellos y material promocional. Filtra por categoría y pide tu cotización."
+        path="/catalogo"
+      />
       {modalImage && (
         <ImageModal src={modalImage.src} alt={modalImage.alt} onClose={() => setModalImage(null)} />
       )}

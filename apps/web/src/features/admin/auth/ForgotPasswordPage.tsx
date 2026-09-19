@@ -4,6 +4,7 @@ import { Printer, ArrowLeft, MailCheck } from "lucide-react";
 import axios from "axios";
 import { extractError } from "@/shared/lib/extractError";
 import { apiBase } from "@/shared/config/env";
+import { Seo } from "@/shared/components/Seo";
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -27,6 +28,11 @@ export function ForgotPasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary/40 px-4">
+      <Seo
+        title="Recuperar contraseña"
+        description="Panel de administración de JTV Multiservice."
+        noindex
+      />
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-card">
         {/* Logo */}
         <div className="mb-8 flex items-center justify-center gap-2 font-bold">

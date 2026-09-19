@@ -67,9 +67,16 @@ export function ProductForm({ product, categories: categoriesProp, onSuccess, on
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Liberar object URLs al desmontar ────────────────────────────────── */
+  // El cleanup corre una sola vez al desmontar y solo vería el `cards` inicial (vacío);
+  // por eso se lee el valor más reciente desde una ref.
+  const cardsRef = useRef(cards);
+  useEffect(() => {
+    cardsRef.current = cards;
+  }, [cards]);
+
   useEffect(() => {
     return () => {
-      cards.forEach((c) => {
+      cardsRef.current.forEach((c) => {
         if (c.file && c.preview.startsWith("blob:")) URL.revokeObjectURL(c.preview);
       });
     };

@@ -9,6 +9,7 @@ import { HeroSection } from "./HeroSection";
 import { ServicesSection } from "./ServicesSection";
 import { ReasonsSection } from "./ReasonsSection";
 import { FeaturedProductsSection } from "./FeaturedProductsSection";
+import { Seo } from "@/shared/components/Seo";
 
 export function HomePage() {
   const [featured, setFeatured] = useState<Product[]>([]);
@@ -30,6 +31,12 @@ export function HomePage() {
 
   return (
     <Layout>
+      <Seo
+        fullTitle
+        title="JTV Multiservice | Imprenta y servicios gráficos en Santo Domingo"
+        description="Imprenta en la Zona Colonial, Santo Domingo: tarjetas, stickers, banners, sellos, camisetas y más. Calidad, entrega rápida y cotización gratis."
+        path="/"
+      />
       <HeroSection />
       <ServicesSection />
       <ReasonsSection />

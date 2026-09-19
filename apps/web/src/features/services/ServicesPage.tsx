@@ -4,6 +4,7 @@ import { Reveal } from "@/shared/components/Reveal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { QuoteCTA } from "@/shared/components/QuoteCTA";
 import { Printer, Shirt, Package, Megaphone, Palette, Check, ArrowRight } from "lucide-react";
+import { Seo } from "@/shared/components/Seo";
 
 const categories = [
   {
@@ -146,6 +147,11 @@ const categories = [
 export function ServicesPage() {
   return (
     <Layout>
+      <Seo
+        title="Servicios de impresión y diseño gráfico"
+        description="Impresión general, stickers y etiquetas, sellos gomígrafos, banners y letreros, material promocional y diseño publicitario en Santo Domingo."
+        path="/servicios"
+      />
       {/* ── Page Header ────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-border bg-secondary/50 py-16">
         <div

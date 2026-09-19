@@ -2,6 +2,7 @@ import { Layout } from "@/shared/components/Layout";
 import { Reveal } from "@/shared/components/Reveal";
 import { Award, Users, Clock, Target, CheckCircle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Seo } from "@/shared/components/Seo";
 
 const stats = [
   {
@@ -41,6 +42,11 @@ const values = [
 export function AboutPage() {
   return (
     <Layout>
+      <Seo
+        title="Nosotros"
+        description="Conoce a JTV Multiservice, imprenta y soluciones gráficas en la Zona Colonial de Santo Domingo. Calidad, atención personalizada y entregas puntuales."
+        path="/nosotros"
+      />
       {/* ── Page Header ────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-border bg-secondary/50 py-16">
         <div

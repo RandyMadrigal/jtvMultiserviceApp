@@ -3,6 +3,7 @@ import { Layout } from "@/shared/components/Layout";
 import { Reveal } from "@/shared/components/Reveal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react";
+import { Seo } from "@/shared/components/Seo";
 
 const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER ?? "18096894995";
 
@@ -47,6 +48,11 @@ export function ContactPage() {
 
   return (
     <Layout>
+      <Seo
+        title="Contacto y cotizaciones"
+        description="Cotiza tu proyecto de impresión con JTV Multiservice: WhatsApp, teléfono 809-689-4995 o visítanos en la Zona Colonial, Santo Domingo. Lunes a sábado."
+        path="/contacto"
+      />
       {/* ── Page Header ────────────────────────────────────────────────── */}
       <PageHeader
         eyebrow="Estamos para ayudarte"

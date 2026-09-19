@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/shared/lib/auth.context";
 import { useTheme } from "@/shared/lib/theme.context";
+import { Seo } from "@/shared/components/Seo";
 
 const navItems = [
   { to: "/admin/products", icon: Package, label: "Productos" },
@@ -92,6 +93,11 @@ export function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <Seo
+        title="Administración"
+        description="Panel de administración de JTV Multiservice."
+        noindex
+      />
       {/* ── Sidebar desktop (md+) ──────────────────────────────────────── */}
       <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-border bg-card">
         <SidebarContent />
