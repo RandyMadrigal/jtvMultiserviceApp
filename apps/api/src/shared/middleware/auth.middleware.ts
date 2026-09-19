@@ -31,6 +31,17 @@ export async function requireAuth(
       return;
     }
 
+    // 3. Verificar que el admin sigue existiendo (un admin eliminado pierde acceso de inmediato)
+    //    y que el token no se emitió antes de un cambio de contraseña
+    const admin = await AdminModel.findById(payload.sub).select("passwordChangedAt").lean();
+    const changedAtSec = admin?.passwordChangedAt
+      ? Math.floor(admin.passwordChangedAt.getTime() / 1000)
+      : 0;
+    if (!admin || (payload.iat ?? 0) < changedAtSec) {
+      res.status(401).json({ error: "Token inválido o expirado" });
+      return;
+    }
+
     req.adminId = payload.sub as string;
     next();
   } catch {

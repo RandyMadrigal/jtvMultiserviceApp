@@ -3,6 +3,7 @@ import { Layout } from "@/shared/components/Layout";
 import { Reveal } from "@/shared/components/Reveal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react";
+import { Seo } from "@/shared/components/Seo";
 
 const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER ?? "18096894995";
 
@@ -42,14 +43,16 @@ export function ContactPage() {
 
   const handleSubmit = () => {
     const text = `Hola, soy ${form.name} (${form.email}). ${form.message}`;
-    window.open(
-      `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`,
-      "_blank",
-    );
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   return (
     <Layout>
+      <Seo
+        title="Contacto y cotizaciones"
+        description="Cotiza tu proyecto de impresión con JTV Multiservice: WhatsApp, teléfono 809-689-4995 o visítanos en la Zona Colonial, Santo Domingo. Lunes a sábado."
+        path="/contacto"
+      />
       {/* ── Page Header ────────────────────────────────────────────────── */}
       <PageHeader
         eyebrow="Estamos para ayudarte"
@@ -85,11 +88,7 @@ export function ContactPage() {
                 <a
                   href={c.href}
                   target={c.href.startsWith("http") ? "_blank" : undefined}
-                  rel={
-                    c.href.startsWith("http")
-                      ? "noopener noreferrer"
-                      : undefined
-                  }
+                  rel={c.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   className="block"
                 >
                   {card}
@@ -127,10 +126,7 @@ export function ContactPage() {
                 className="space-y-5"
               >
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="mb-1.5 block text-sm font-semibold"
-                  >
+                  <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
                     Nombre completo
                   </label>
                   <input
@@ -145,10 +141,7 @@ export function ContactPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-1.5 block text-sm font-semibold"
-                  >
+                  <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
                     Correo electrónico
                   </label>
                   <input
@@ -157,19 +150,14 @@ export function ContactPage() {
                     required
                     maxLength={150}
                     value={form.email}
-                    onChange={(e) =>
-                      setForm({ ...form, email: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="tu@correo.com"
                     className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15 placeholder:text-muted-foreground/60"
                   />
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="message"
-                    className="mb-1.5 block text-sm font-semibold"
-                  >
+                  <label htmlFor="message" className="mb-1.5 block text-sm font-semibold">
                     Mensaje / Descripción del proyecto
                   </label>
                   <textarea
@@ -178,9 +166,7 @@ export function ContactPage() {
                     maxLength={1000}
                     rows={5}
                     value={form.message}
-                    onChange={(e) =>
-                      setForm({ ...form, message: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
                     placeholder="Cuéntanos qué necesitas imprimir, cantidad, medidas, etc."
                     className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/15 placeholder:text-muted-foreground/60"
                   />

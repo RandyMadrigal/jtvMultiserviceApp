@@ -163,10 +163,7 @@ export function CategoriesAdminPage() {
               {creating && <InlineForm />}
               {categories.length === 0 && !creating ? (
                 <tr>
-                  <td
-                    colSpan={3}
-                    className="py-16 text-center text-muted-foreground"
-                  >
+                  <td colSpan={3} className="py-16 text-center text-muted-foreground">
                     No hay categorías. Crea la primera.
                   </td>
                 </tr>

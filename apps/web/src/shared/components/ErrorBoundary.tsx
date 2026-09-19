@@ -48,9 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
           </svg>
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Algo salió mal
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">Algo salió mal</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Ocurrió un error inesperado en esta sección.
           </p>

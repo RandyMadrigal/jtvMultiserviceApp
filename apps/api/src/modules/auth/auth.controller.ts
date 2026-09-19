@@ -94,11 +94,26 @@ export const logoutHandler = asyncHandler(async (req: AuthRequest, res: Response
     return revokeAccessToken(accessToken, expiresAt);
   };
 
-  // allSettled: la cookie se limpia aunque la DB falle en revocar
-  await Promise.allSettled([
+  // allSettled: la cookie se limpia aunque la DB falle en revocar,
+  // pero el fallo se registra porque el token seguiría válido hasta expirar
+  const results = await Promise.allSettled([
     refreshToken ? revokeRefreshToken(refreshToken) : Promise.resolve(),
     revokeAccess(),
   ]);
+  const labels = ["refresh_token", "access_token"] as const;
+  results.forEach((result, i) => {
+    if (result.status === "rejected") {
+      logger.error({
+        audit:  true,
+        action: "auth.logout_revoke_failed",
+        token:  labels[i],
+        by:     req.adminId,
+        ip:     req.ip,
+        reqId:  req.requestId,
+        err:    result.reason,
+      }, "No se pudo revocar el token al cerrar sesión");
+    }
+  });
 
   res.clearCookie(COOKIE_NAME, { path: "/api/auth" });
   res.json({ message: "Sesión cerrada correctamente" });

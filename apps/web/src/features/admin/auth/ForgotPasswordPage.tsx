@@ -4,12 +4,13 @@ import { Printer, ArrowLeft, MailCheck } from "lucide-react";
 import axios from "axios";
 import { extractError } from "@/shared/lib/extractError";
 import { apiBase } from "@/shared/config/env";
+import { Seo } from "@/shared/components/Seo";
 
 export function ForgotPasswordPage() {
-  const [email, setEmail]         = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [sent, setSent]           = useState(false);
-  const [error, setError]         = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +28,11 @@ export function ForgotPasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary/40 px-4">
+      <Seo
+        title="Recuperar contraseña"
+        description="Panel de administración de JTV Multiservice."
+        noindex
+      />
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-card">
         {/* Logo */}
         <div className="mb-8 flex items-center justify-center gap-2 font-bold">
@@ -45,9 +51,8 @@ export function ForgotPasswordPage() {
             </div>
             <h1 className="mb-2 text-xl font-bold">Revisa tu correo</h1>
             <p className="mb-6 text-sm text-muted-foreground">
-              Si <span className="font-medium text-foreground">{email}</span> está
-              registrado, recibirás un enlace para restablecer tu contraseña en los
-              próximos minutos.
+              Si <span className="font-medium text-foreground">{email}</span> está registrado,
+              recibirás un enlace para restablecer tu contraseña en los próximos minutos.
             </p>
             <p className="text-xs text-muted-foreground">
               ¿No llegó el correo? Revisa la carpeta de spam o{" "}

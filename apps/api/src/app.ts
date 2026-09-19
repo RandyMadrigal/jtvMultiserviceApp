@@ -8,6 +8,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import { MongoRateLimitStore } from "@/shared/middleware/mongo-rate-limit-store";
 import mongoose from "mongoose";
 import { env } from "@/shared/config/env";
+import { AppError } from "@/shared/errors/AppError";
 import { errorMiddleware } from "@/shared/middleware/error.middleware";
 import { requestIdMiddleware } from "@/shared/middleware/requestId.middleware";
 import { authRouter } from "@/modules/auth/auth.routes";
@@ -24,7 +25,8 @@ app.set("trust proxy", 1);
 app.use(requestIdMiddleware);
 
 // ── Health check ─────────────────────────────────────────────────────────────
-//Si HEALTH_TOKEN está definida en env, requiere el header X-Health-Token para acceder
+// Público a propósito: el healthcheck de Railway lo llama sin cabeceras. Solo expone
+// el estado de la conexión a la base de datos, nada sensible.
 app.get("/health", async (_req, res) => {
   const dbHealthy = mongoose.connection.readyState === 1;
   res.status(dbHealthy ? 200 : 503).json({
@@ -66,7 +68,7 @@ app.use(
       // Sin Origin = petición server-to-server (healthchecks, curl) — CORS no aplica
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
-      callback(new Error("Origen no permitido por CORS"));
+      callback(new AppError(403, "Origen no permitido por CORS"));
     },
     credentials:    true,
     methods:        ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

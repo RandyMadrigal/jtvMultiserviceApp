@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import axios from "axios";
 import { apiClient, setToken } from "./api-client";
 import { apiBase } from "@/shared/config/env";
@@ -24,12 +17,14 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+let initialRefresh: Promise<{ data: { accessToken: string } }> | null = null;
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading]             = useState(true);
-  const [user, setUser]                       = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const fetchUser = useCallback(async () => {
     try {
@@ -42,8 +37,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Al montar: intenta renovar la sesión con la cookie existente
   useEffect(() => {
-    axios
-      .post(`${apiBase}/auth/refresh`, {}, { withCredentials: true })
+    // El refresh token es de un solo uso: StrictMode ejecuta este efecto dos veces en dev,
+    // así que ambas ejecuciones comparten la misma petición en vez de enviar dos.
+    initialRefresh ??= axios
+      .post<{ accessToken: string }>(`${apiBase}/auth/refresh`, {}, { withCredentials: true })
+      .finally(() => {
+        initialRefresh = null;
+      });
+
+    initialRefresh
       .then(async ({ data }) => {
         setToken(data.accessToken);
         setIsAuthenticated(true);
@@ -57,19 +59,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false));
   }, [fetchUser]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const { data } = await apiClient.post("/auth/login", { email, password });
-    setToken(data.accessToken);
-    setIsAuthenticated(true);
-    await fetchUser();
-  }, [fetchUser]);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const { data } = await apiClient.post("/auth/login", { email, password });
+      setToken(data.accessToken);
+      setIsAuthenticated(true);
+      await fetchUser();
+    },
+    [fetchUser],
+  );
 
-  const verifyOtp = useCallback(async (email: string, otp: string) => {
-    const { data } = await apiClient.post("/auth/verify-otp", { email, otp });
-    setToken(data.accessToken);
-    setIsAuthenticated(true);
-    await fetchUser();
-  }, [fetchUser]);
+  const verifyOtp = useCallback(
+    async (email: string, otp: string) => {
+      const { data } = await apiClient.post("/auth/verify-otp", { email, otp });
+      setToken(data.accessToken);
+      setIsAuthenticated(true);
+      await fetchUser();
+    },
+    [fetchUser],
+  );
 
   const logout = useCallback(async () => {
     try {

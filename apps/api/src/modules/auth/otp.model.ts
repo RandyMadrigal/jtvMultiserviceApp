@@ -4,6 +4,7 @@ const otpSchema = new mongoose.Schema({
   email:     { type: String, required: true, lowercase: true },
   codeHash:  { type: String, required: true }, // SHA-256 del código — nunca se guarda el código plano
   expiresAt: { type: Date,   required: true },
+  attempts:  { type: Number, default: 0 }, // intentos de verificación consumidos
 }, { versionKey: false });
 
 otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

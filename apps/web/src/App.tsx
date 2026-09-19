@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./features/admin/components/ProtectedRoute";
 import { ErrorBoundary } from "./shared/components/ErrorBoundary";
 import { ScrollToTop } from "./shared/components/ScrollToTop";
 import { Toaster } from "./shared/components/ui/sonner";
+import { Seo } from "@/shared/components/Seo";
 
 // Lazy loading — cada ruta se carga solo cuando se navega a ella
 const HomePage = lazy(() =>
@@ -76,11 +77,14 @@ function PageLoader() {
 function NotFoundPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <Seo
+        title="Página no encontrada"
+        description="La página que buscas no existe o fue movida."
+        noindex
+      />
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">
-          Página no encontrada
-        </h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Página no encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           La página que buscas no existe o fue movida.
         </p>
@@ -114,9 +118,9 @@ export default function App() {
               <Route path="/contacto" element={<ContactPage />} />
 
               {/* ── Panel de administración ─────────────────────────── */}
-              <Route path="/admin/login"           element={<LoginPage />} />
+              <Route path="/admin/login" element={<LoginPage />} />
               <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/admin/reset-password"  element={<ResetPasswordPage />} />
+              <Route path="/admin/reset-password" element={<ResetPasswordPage />} />
               <Route
                 path="/admin"
                 element={
@@ -125,10 +129,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
-                <Route
-                  index
-                  element={<Navigate to="/admin/products" replace />}
-                />
+                <Route index element={<Navigate to="/admin/products" replace />} />
                 <Route path="products" element={<ProductsAdminPage />} />
                 <Route path="categories" element={<CategoriesAdminPage />} />
                 <Route path="admins" element={<AdminsPage />} />

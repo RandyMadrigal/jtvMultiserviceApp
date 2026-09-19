@@ -1,7 +1,7 @@
 {
   "name": "jtv-multiservice",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": ["apps/*"],
   "engines": {
     "node": ">=20.0.0"
   },

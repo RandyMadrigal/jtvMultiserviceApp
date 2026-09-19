@@ -10,15 +10,19 @@ import { sendPasswordResetEmail, sendOtpEmail } from "@/shared/utils/email";
 import { env } from "@/shared/config/env";
 import { AppError } from "@/shared/errors/AppError";
 import { logger } from "@/shared/utils/logger";
-import { hashOtp } from "@/shared/utils/crypto";
+import { hashOtp, hashToken } from "@/shared/utils/crypto";
 import type { LoginDto, VerifyOtpDto } from "./auth.types";
 
 export const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
 
-// Hash bcrypt válido (cost 12) usado solo para igualación de tiempo en login.
+const MAX_OTP_ATTEMPTS = 5;
+
+// Hash bcrypt real (cost 12) usado solo para igualación de tiempo en login.
 // Cuando el email no existe, bcrypt.compare corre igual que con un hash real,
 // eliminando el timing oracle que permitiría enumerar emails válidos.
-const DUMMY_HASH = "$2b$12$AAAAAAAAAAAAAAAAAAAAAAbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+// Debe generarse con bcrypt: un hash con formato inválido hace que compare()
+// retorne de inmediato y reintroduce la diferencia de tiempo.
+const DUMMY_HASH = bcrypt.hashSync(crypto.randomBytes(16).toString("hex"), 12);
 
 function generateAccessToken(adminId: string): string {
   return jwt.sign(
@@ -31,7 +35,7 @@ function generateAccessToken(adminId: string): string {
 async function createRefreshToken(adminId: string): Promise<string> {
   const token = crypto.randomBytes(64).toString("hex");
   await RefreshToken.create({
-    token,
+    token: hashToken(token), // en la DB solo vive el hash; el token en claro va únicamente en la cookie
     adminId,
     expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
   });
@@ -62,17 +66,34 @@ export async function login(
 }
 
 export async function verifyOtp(dto: VerifyOtpDto): Promise<{ accessToken: string; refreshToken: string }> {
-  const codeHash = hashOtp(dto.otp);
+  const email = dto.email.toLowerCase();
 
-  // findOneAndDelete atómico: previene race condition entre requests concurrentes
-  const otp = await OtpModel.findOneAndDelete({
-    email:    dto.email.toLowerCase(),
-    codeHash,
-  });
+  // Cuenta el intento de forma atómica ANTES de comparar: requests concurrentes
+  // no pueden exceder MAX_OTP_ATTEMPTS. El límite es por código (por email),
+  // independiente de la IP, así que rotar IPs no permite adivinar el OTP.
+  const otp = await OtpModel.findOneAndUpdate(
+    // $not/$gte (y no $lt): también coincide con OTPs creados antes de existir el campo `attempts`
+    { email, expiresAt: { $gt: new Date() }, attempts: { $not: { $gte: MAX_OTP_ATTEMPTS } } },
+    { $inc: { attempts: 1 } },
+    { new: true },
+  );
 
-  if (!otp || otp.expiresAt < new Date()) {
+  if (!otp) {
     throw new AppError(400, "Código inválido o expirado");
   }
+
+  const submitted = Buffer.from(hashOtp(dto.otp), "hex");
+  const stored    = Buffer.from(otp.codeHash, "hex");
+  const matches   = submitted.length === stored.length && crypto.timingSafeEqual(submitted, stored);
+
+  if (!matches) {
+    if (otp.attempts >= MAX_OTP_ATTEMPTS) await OtpModel.deleteOne({ _id: otp._id });
+    throw new AppError(400, "Código inválido o expirado");
+  }
+
+  // Un solo uso: si otro request concurrente ya lo consumió, este falla
+  const consumed = await OtpModel.findOneAndDelete({ _id: otp._id });
+  if (!consumed) throw new AppError(400, "Código inválido o expirado");
 
   const admin = await AdminModel.findOneAndUpdate(
     { email: dto.email.toLowerCase() },
@@ -91,7 +112,7 @@ export async function refreshAccessToken(
   oldToken: string,
 ): Promise<{ accessToken: string; newRefreshToken: string }> {
   // Elimina el token viejo atómicamente — si ya fue usado es un replay attack
-  const stored = await RefreshToken.findOneAndDelete({ token: oldToken });
+  const stored = await RefreshToken.findOneAndDelete({ token: hashToken(oldToken) });
 
   if (!stored) {
     throw new AppError(401, "Refresh token inválido o expirado");
@@ -114,7 +135,7 @@ export async function refreshAccessToken(
 }
 
 export async function revokeRefreshToken(token: string): Promise<void> {
-  await RefreshToken.deleteOne({ token });
+  await RefreshToken.deleteOne({ token: hashToken(token) });
 }
 
 export async function revokeAllAdminTokens(adminId: string): Promise<void> {
@@ -178,9 +199,13 @@ export async function resetPassword(rawToken: string, newPassword: string): Prom
   }
 
   const hash = await bcrypt.hash(newPassword, 12);
-  await AdminModel.updateOne({ _id: record.adminId }, { $set: { password: hash, verified: true } });
+  await AdminModel.updateOne(
+    { _id: record.adminId },
+    { $set: { password: hash, verified: true, passwordChangedAt: new Date() } },
+  );
 
-  // Invalida todas las sesiones activas tras el cambio de contraseña
+  // Invalida todas las sesiones activas tras el cambio de contraseña:
+  // los refresh tokens se borran y requireAuth rechaza los access tokens anteriores a passwordChangedAt
   await RefreshToken.deleteMany({ adminId: record.adminId });
 
   logger.info({

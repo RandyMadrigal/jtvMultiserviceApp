@@ -60,101 +60,103 @@
 
   /* Gradients */
   /* Brand gradient: pure blue — professional, corporate */
-  --gradient-brand: linear-gradient(135deg, #0AABEE 0%, #0082C8 100%);
-  --gradient-brand-r: linear-gradient(135deg, #0082C8 0%, #0AABEE 100%);
+  --gradient-brand: linear-gradient(135deg, #0aabee 0%, #0082c8 100%);
+  --gradient-brand-r: linear-gradient(135deg, #0082c8 0%, #0aabee 100%);
   /* Light mode: soft dark navy — pleasant, not harsh, white text readable */
-  --gradient-hero: linear-gradient(150deg, #0E1F35 0%, #163352 45%, #0E1F35 100%);
-  --gradient-blue: linear-gradient(135deg, #0099D9 0%, #0077B6 100%);
-  --gradient-magenta: linear-gradient(135deg, #C1007E 0%, #7D0052 100%);
-  --gradient-yellow: linear-gradient(135deg, #FCEC00 0%, #F5C200 100%);
-  --gradient-accent: linear-gradient(135deg, #0099D9 0%, #0077B6 100%);
+  --gradient-hero: linear-gradient(150deg, #0e1f35 0%, #163352 45%, #0e1f35 100%);
+  --gradient-blue: linear-gradient(135deg, #0099d9 0%, #0077b6 100%);
+  --gradient-magenta: linear-gradient(135deg, #c1007e 0%, #7d0052 100%);
+  --gradient-yellow: linear-gradient(135deg, #fcec00 0%, #f5c200 100%);
+  --gradient-accent: linear-gradient(135deg, #0099d9 0%, #0077b6 100%);
 }
 
 :root {
   --radius: 0.875rem;
 
   /* JTV Corporate Brand Colors */
-  --jtv-blue: #0099D9;
-  --jtv-magenta: #C1007E;
-  --jtv-yellow: #FCEC00;
+  --jtv-blue: #0099d9;
+  --jtv-magenta: #c1007e;
+  --jtv-yellow: #fcec00;
 
-  --background: #FAFCFF;
-  --foreground: #0B0D17;
-  --card: #FFFFFF;
-  --card-foreground: #0B0D17;
-  --popover: #FFFFFF;
-  --popover-foreground: #0B0D17;
+  --background: #fafcff;
+  --foreground: #0b0d17;
+  --card: #ffffff;
+  --card-foreground: #0b0d17;
+  --popover: #ffffff;
+  --popover-foreground: #0b0d17;
 
   /* JTV Blue — darkened slightly for 4.5:1 contrast on white (WCAG AA) */
-  --primary: #0079B5;
-  --primary-foreground: #FFFFFF;
+  --primary: #0079b5;
+  --primary-foreground: #ffffff;
 
-  --secondary: #EFF5FB;
-  --secondary-foreground: #0B0D17;
-  --muted: #F4F6FA;
-  --muted-foreground: #64748B;
-  --accent: #EAF7FF;
-  --accent-foreground: #0B0D17;
+  --secondary: #eff5fb;
+  --secondary-foreground: #0b0d17;
+  --muted: #f4f6fa;
+  --muted-foreground: #64748b;
+  --accent: #eaf7ff;
+  --accent-foreground: #0b0d17;
 
-  --destructive: #E11D48;
-  --destructive-foreground: #FFFFFF;
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
 
   --border: rgba(0, 0, 0, 0.07);
   --input: rgba(0, 0, 0, 0.07);
-  --ring: #0079B5;
+  --ring: #0079b5;
 
-  --brand: #0099D9;
-  --brand-foreground: #FFFFFF;
-  --brand-dark: #0B0D17;
-  --magenta: #C1007E;
+  --brand: #0099d9;
+  --brand-foreground: #ffffff;
+  --brand-dark: #0b0d17;
+  --magenta: #c1007e;
 
-  --success: #10B981;
-  --warning: #FCEC00;
+  --success: #10b981;
+  --warning: #fcec00;
 
-  --sidebar: #FAFCFF;
-  --sidebar-foreground: #0B0D17;
-  --sidebar-primary: #0099D9;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #EFF5FB;
-  --sidebar-accent-foreground: #0B0D17;
+  --sidebar: #fafcff;
+  --sidebar-foreground: #0b0d17;
+  --sidebar-primary: #0099d9;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eff5fb;
+  --sidebar-accent-foreground: #0b0d17;
   --sidebar-border: rgba(0, 0, 0, 0.07);
-  --sidebar-ring: #0099D9;
+  --sidebar-ring: #0099d9;
 }
 
 .dark {
-  --gradient-hero: linear-gradient(150deg, #03070F 0%, #0B1526 50%, #050B18 100%);
-  --background: #060C1A;
-  --foreground: #EDF0FB;
-  --card: #0D1633;
-  --card-foreground: #EDF0FB;
-  --popover: #0C1530;
-  --popover-foreground: #EDF0FB;
-  --primary: #0AABEC;
-  --primary-foreground: #FFFFFF;
+  --gradient-hero: linear-gradient(150deg, #03070f 0%, #0b1526 50%, #050b18 100%);
+  --background: #060c1a;
+  --foreground: #edf0fb;
+  --card: #0d1633;
+  --card-foreground: #edf0fb;
+  --popover: #0c1530;
+  --popover-foreground: #edf0fb;
+  --primary: #0aabec;
+  --primary-foreground: #ffffff;
   --secondary: rgba(255, 255, 255, 0.07);
-  --secondary-foreground: #EDF0FB;
+  --secondary-foreground: #edf0fb;
   --muted: rgba(255, 255, 255, 0.05);
   --muted-foreground: rgba(237, 240, 251, 0.5);
   --accent: rgba(0, 153, 217, 0.15);
-  --accent-foreground: #EDF0FB;
+  --accent-foreground: #edf0fb;
   --border: rgba(255, 255, 255, 0.09);
   --input: rgba(255, 255, 255, 0.09);
-  --ring: #0099D9;
-  --brand: #0099D9;
-  --brand-dark: #060C1A;
-  --magenta: #D4009A;
-  --sidebar: #0C1530;
-  --sidebar-foreground: #EDF0FB;
-  --sidebar-primary: #0099D9;
-  --sidebar-primary-foreground: #FFFFFF;
+  --ring: #0099d9;
+  --brand: #0099d9;
+  --brand-dark: #060c1a;
+  --magenta: #d4009a;
+  --sidebar: #0c1530;
+  --sidebar-foreground: #edf0fb;
+  --sidebar-primary: #0099d9;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: rgba(255, 255, 255, 0.07);
-  --sidebar-accent-foreground: #EDF0FB;
+  --sidebar-accent-foreground: #edf0fb;
   --sidebar-border: rgba(255, 255, 255, 0.09);
-  --sidebar-ring: #0099D9;
+  --sidebar-ring: #0099d9;
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  * {
+    border-color: var(--color-border);
+  }
   html {
     font-family: var(--font-sans);
     scroll-behavior: smooth;
@@ -170,7 +172,10 @@
     /* Prevent layout shift from scrollbar appearing/disappearing */
     scrollbar-gutter: stable;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: -0.025em;
@@ -183,37 +188,66 @@
 .theme-transitioning * {
   transition:
     background-color 0.35s ease,
-    color            0.35s ease,
-    border-color     0.35s ease,
-    box-shadow       0.35s ease !important;
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease !important;
 }
 
 /* ── Page enter animation ──────────────────────────────────────────────────── */
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .page-enter {
   animation: pageEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-
 @layer utilities {
   /* Gradients */
-  .bg-gradient-brand   { background-image: var(--gradient-brand); }
-  .bg-gradient-brand-r { background-image: var(--gradient-brand-r); }
-  .bg-gradient-hero    { background-image: var(--gradient-hero); }
-  .bg-gradient-blue    { background-image: var(--gradient-blue); }
-  .bg-gradient-magenta { background-image: var(--gradient-magenta); }
-  .bg-gradient-yellow  { background-image: var(--gradient-yellow); }
-  .bg-gradient-accent  { background-image: var(--gradient-blue); }
+  .bg-gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+  .bg-gradient-brand-r {
+    background-image: var(--gradient-brand-r);
+  }
+  .bg-gradient-hero {
+    background-image: var(--gradient-hero);
+  }
+  .bg-gradient-blue {
+    background-image: var(--gradient-blue);
+  }
+  .bg-gradient-magenta {
+    background-image: var(--gradient-magenta);
+  }
+  .bg-gradient-yellow {
+    background-image: var(--gradient-yellow);
+  }
+  .bg-gradient-accent {
+    background-image: var(--gradient-blue);
+  }
 
   /* Shadows */
-  .shadow-card         { box-shadow: var(--shadow-card); }
-  .shadow-elegant      { box-shadow: var(--shadow-elegant); }
-  .shadow-glass        { box-shadow: var(--shadow-glass); }
-  .shadow-glow         { box-shadow: var(--shadow-glow); }
-  .shadow-glow-magenta { box-shadow: var(--shadow-glow-magenta); }
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  .shadow-glass {
+    box-shadow: var(--shadow-glass);
+  }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  .shadow-glow-magenta {
+    box-shadow: var(--shadow-glow-magenta);
+  }
 
   /* Glassmorphism utilities */
   .glass {
@@ -257,7 +291,11 @@
     background-clip: text;
   }
   /* Magenta accent text — used sparingly */
-  .text-magenta { color: var(--magenta); }
+  .text-magenta {
+    color: var(--magenta);
+  }
 
-  .text-balance { text-wrap: balance; }
+  .text-balance {
+    text-wrap: balance;
+  }
 }

@@ -3,15 +3,8 @@ import { Layout } from "@/shared/components/Layout";
 import { Reveal } from "@/shared/components/Reveal";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { QuoteCTA } from "@/shared/components/QuoteCTA";
-import {
-  Printer,
-  Shirt,
-  Package,
-  Megaphone,
-  Palette,
-  Check,
-  ArrowRight,
-} from "lucide-react";
+import { Printer, Shirt, Package, Megaphone, Palette, Check, ArrowRight } from "lucide-react";
+import { Seo } from "@/shared/components/Seo";
 
 const categories = [
   {
@@ -155,6 +148,11 @@ const categories = [
 export function ServicesPage() {
   return (
     <Layout>
+      <Seo
+        title="Servicios de impresión y diseño gráfico"
+        description="Impresión general, stickers y etiquetas, sellos gomígrafos, banners y letreros, material promocional y diseño publicitario en Santo Domingo."
+        path="/servicios"
+      />
       {/* ── Page Header ────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-border bg-secondary/50 py-16">
         <div
@@ -217,9 +215,7 @@ export function ServicesPage() {
                         <Check className="h-3.5 w-3.5" />
                       </span>
                       <div>
-                        <h3 className="font-bold font-display text-sm">
-                          {s.name}
-                        </h3>
+                        <h3 className="font-bold font-display text-sm">{s.name}</h3>
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                           {s.desc}
                         </p>
@@ -254,8 +250,7 @@ export function ServicesPage() {
                     ¿No ves lo que buscas?
                   </h2>
                   <p className="mt-1.5 text-white/65">
-                    Hacemos trabajos personalizados — pregúntanos sin
-                    compromiso.
+                    Hacemos trabajos personalizados — pregúntanos sin compromiso.
                   </p>
                 </div>
                 <Link

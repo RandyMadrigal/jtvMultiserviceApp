@@ -61,10 +61,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav
-          className="hidden items-center gap-0.5 md:flex"
-          aria-label="Navegación principal"
-        >
+        <nav className="hidden items-center gap-0.5 md:flex" aria-label="Navegación principal">
           {links.map((l) => (
             <NavLink
               key={l.to}
@@ -87,18 +84,10 @@ export function Navbar() {
         <div className="hidden items-center gap-2 md:flex">
           <button
             onClick={toggle}
-            aria-label={
-              theme === "dark"
-                ? "Cambiar a modo claro"
-                : "Cambiar a modo oscuro"
-            }
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
             className="rounded-lg p-2 text-foreground/55 transition-all duration-200 hover:bg-secondary hover:text-foreground"
           >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <Link
             to="/contacto"
@@ -112,18 +101,10 @@ export function Navbar() {
         <div className="flex items-center gap-1 md:hidden">
           <button
             onClick={toggle}
-            aria-label={
-              theme === "dark"
-                ? "Cambiar a modo claro"
-                : "Cambiar a modo oscuro"
-            }
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
             className="rounded-lg p-2 text-foreground/55 transition-colors hover:bg-secondary"
           >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <button
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -139,7 +120,10 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {open && (
-        <div id="mobile-menu" className="border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden">
+        <div
+          id="mobile-menu"
+          className="border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden"
+        >
           <nav
             className="mx-auto flex max-w-7xl flex-col gap-0.5 px-4 py-3"
             aria-label="Menú móvil"

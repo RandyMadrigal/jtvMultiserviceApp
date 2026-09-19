@@ -1,14 +1,17 @@
 const _whatsapp = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined;
-const _apiUrl   = import.meta.env.VITE_API_URL         as string | undefined;
+const _apiUrl = import.meta.env.VITE_API_URL as string | undefined;
 
 if (import.meta.env.DEV) {
-  if (!_whatsapp) console.warn("[env] VITE_WHATSAPP_NUMBER no está definido — el botón de WhatsApp no funcionará");
-  if (!_apiUrl)   console.warn("[env] VITE_API_URL no está definido — usando proxy de Vite (/api)");
+  if (!_whatsapp)
+    console.warn(
+      "[env] VITE_WHATSAPP_NUMBER no está definido — el botón de WhatsApp no funcionará",
+    );
+  if (!_apiUrl) console.warn("[env] VITE_API_URL no está definido — usando proxy de Vite (/api)");
 }
 
 export const clientEnv = {
   whatsappNumber: _whatsapp ?? "",
-  apiUrl:         _apiUrl   ?? "",
+  apiUrl: _apiUrl ?? "",
 } as const;
 
 // Base URL para todas las llamadas a la API.

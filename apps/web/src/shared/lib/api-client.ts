@@ -8,6 +8,15 @@ let accessToken: string | null = null;
 // Evita múltiples llamadas paralelas al endpoint de refresh
 let refreshPromise: Promise<string> | null = null;
 
+const AUTH_FLOW_PATHS = [
+  "/auth/login",
+  "/auth/verify-otp",
+  "/auth/resend-otp",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+  "/auth/refresh",
+];
+
 export function setToken(token: string | null): void {
   accessToken = token;
 }
@@ -32,7 +41,11 @@ apiClient.interceptors.response.use(
   async (error) => {
     const config = error.config as typeof error.config & { _retry?: boolean };
 
-    if (error.response?.status !== 401 || config._retry) {
+    // En estos endpoints un 401 significa credenciales/token inválidos, no sesión expirada:
+    // intentar refrescar y redirigir recargaría la página y perdería el mensaje de error.
+    const isAuthFlow = AUTH_FLOW_PATHS.some((p) => config.url?.startsWith(p));
+
+    if (error.response?.status !== 401 || config._retry || isAuthFlow) {
       return Promise.reject(error);
     }
 
@@ -40,11 +53,7 @@ apiClient.interceptors.response.use(
 
     if (!refreshPromise) {
       refreshPromise = axios
-        .post<{ accessToken: string }>(
-          `${apiBase}/auth/refresh`,
-          {},
-          { withCredentials: true },
-        )
+        .post<{ accessToken: string }>(`${apiBase}/auth/refresh`, {}, { withCredentials: true })
         .then(({ data }) => {
           setToken(data.accessToken);
           return data.accessToken;

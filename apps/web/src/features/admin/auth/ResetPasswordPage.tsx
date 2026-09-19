@@ -4,23 +4,29 @@ import { Printer, ArrowLeft, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import axios from "axios";
 import { extractError } from "@/shared/lib/extractError";
 import { apiBase } from "@/shared/config/env";
+import { Seo } from "@/shared/components/Seo";
 
 export function ResetPasswordPage() {
-  const [searchParams]  = useSearchParams();
-  const navigate        = useNavigate();
-  const token           = searchParams.get("token") ?? "";
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const token = searchParams.get("token") ?? "";
 
-  const [password, setPassword]     = useState("");
-  const [confirm, setConfirm]       = useState("");
-  const [showPass, setShowPass]     = useState(false);
-  const [showConf, setShowConf]     = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [showConf, setShowConf] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError]           = useState("");
-  const [done, setDone]             = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
 
   if (!token) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-secondary/40 px-4">
+        <Seo
+          title="Restablecer contraseña"
+          description="Panel de administración de JTV Multiservice."
+          noindex
+        />
         <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center shadow-card">
           <p className="mb-4 text-sm text-destructive">
             Enlace de restablecimiento inválido o expirado.
@@ -57,6 +63,11 @@ export function ResetPasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary/40 px-4">
+      <Seo
+        title="Restablecer contraseña"
+        description="Panel de administración de JTV Multiservice."
+        noindex
+      />
       <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-card">
         {/* Logo */}
         <div className="mb-8 flex items-center justify-center gap-2 font-bold">
